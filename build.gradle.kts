@@ -40,9 +40,9 @@ publishing {
 
     publications.create<MavenPublication>("maven") {
 
-        groupId = "com.abstract-mind"
+        groupId = "org.dooq"
         artifactId = "dooq"
-        version = "1.0"
+        version = "1.0.0-SNAPSHOT"
 
         from(components["java"])
     }

@@ -1,0 +1,18 @@
+package org.dooq.annot;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.FIELD)
+public @interface Lazy {
+
+    Class<?> type() default Void.class;
+
+    String[] value();
+
+    String table() default "";
+
+}
