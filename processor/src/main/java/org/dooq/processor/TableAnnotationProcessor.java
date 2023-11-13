@@ -69,6 +69,61 @@ public class TableAnnotationProcessor extends AbstractProcessor {
         return tableName;
     }
 
+    private String buildField(VariableElement fieldElement, String columnName) {
+
+        var builder = new StringBuilder();
+
+        final var type = fieldElement.asType().toString();
+
+        System.out.println(columnName + " " + type);
+
+        if (type.startsWith("java.util")) {
+
+            final var param = type.substring(type.indexOf("<") + 1, type.indexOf(">"));
+
+            if (type.startsWith("java.util.Set")) {
+
+                return builder.append("FieldBuilder.ofSet(\"")
+                        .append(columnName)
+                        .append("\", ")
+                        .append(param)
+                        .append(".class, this);\n")
+                        .toString();
+
+            } else if (type.startsWith("java.util.Map")) {
+
+                return builder.append("FieldBuilder.ofMap(\"")
+                        .append(columnName)
+                        .append("\", ")
+                        .append(param)
+                        .append(".class, this);\n")
+                        .toString();
+
+            } else if (type.startsWith("java.util.List")) {
+
+                return builder.append("FieldBuilder.ofList(\"")
+                        .append(columnName)
+                        .append("\", ")
+                        .append(param)
+                        .append(".class, this);\n")
+                        .toString();
+
+            }
+
+            System.out.println("Missing: " + type);
+        }
+
+        builder.append("FieldBuilder.of(\"")
+                .append(columnName)
+                .append("\", ")
+                .append(type)
+                .append(".class, this);\n");
+
+
+        return builder.toString();
+
+    }
+
     private Table process(Element element) {
 
         if (element.getKind() != ElementKind.CLASS) {
@@ -125,7 +180,7 @@ public class TableAnnotationProcessor extends AbstractProcessor {
         List<? extends Element> enclosedElements = element.getEnclosedElements();
 
         var partitionColumn = "";
-        var sortColumn = "";
+        var sortColumn = "null";
 
         VariableElement partition = null;
         VariableElement sort = null;
@@ -161,11 +216,8 @@ public class TableAnnotationProcessor extends AbstractProcessor {
                         .append(keyName)
                         .append("> ")
                         .append(fieldElement.getSimpleName().toString().toUpperCase())
-                        .append(" = FieldBuilder.of(\"")
-                        .append(columnName)
-                        .append("\", ")
-                        .append(fieldElement.asType().toString())
-                        .append(".class, this);\n");
+                        .append(" = ")
+                        .append(buildField(fieldElement, columnName));
 
             }
         }

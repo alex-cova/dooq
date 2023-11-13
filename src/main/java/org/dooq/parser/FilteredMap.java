@@ -1,4 +1,5 @@
-package org.dooq.core;
+package org.dooq.parser;
+
 
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
@@ -7,6 +8,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * This class is used to filter null values from map
+ *
+ * @author alex
+ */
 public final class FilteredMap extends HashMap<String, AttributeValue> {
 
     public FilteredMap() {

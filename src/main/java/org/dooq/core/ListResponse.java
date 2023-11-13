@@ -3,8 +3,8 @@ package org.dooq.core;
 import org.dooq.api.AbstractRecord;
 import org.dooq.api.Column;
 import org.dooq.Key;
+import org.dooq.api.DynamoConverter;
 import org.dooq.api.Table;
-import org.dooq.engine.ParserCompiler;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -42,10 +42,10 @@ public interface ListResponse<R extends AbstractRecord<R>, K extends Key> extend
             sameTable = getTable().getRecordType() == type;
         }
 
-        var compiledParser = ParserCompiler.getParser(type);
+        var compiledParser = DynamoConverter.getConverter(type);
 
         var items = getItems().stream()
-                .map(compiledParser::parse)
+                .map(compiledParser::read)
                 .collect(Collectors.toCollection(ArrayList::new));
 
         if (sameTable) {
@@ -56,7 +56,7 @@ public interface ListResponse<R extends AbstractRecord<R>, K extends Key> extend
 
         return items;
     }
-    
+
     default @Nullable String getLastEvaluatedKey(Column<R, K> column) {
         return getLastKey().get(column);
     }

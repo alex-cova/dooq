@@ -2,9 +2,10 @@ package org.dooq;
 
 import org.dooq.api.AbstractRecord;
 import org.dooq.api.Column;
+import org.dooq.api.DynamoConverter;
 import org.dooq.core.response.BufferedBatchWriteItemResponse;
 import org.dooq.core.response.BufferedGetResponse;
-import org.dooq.engine.ParserCompiler;
+import org.dooq.parser.ParserCompiler;
 import org.dooq.projection.Projection;
 import org.dooq.api.Table;
 import org.dooq.core.ItemParser;
@@ -253,7 +254,7 @@ public class DynamoSL {
 
     public <T extends AbstractRecord<T>> T newRecord(@NotNull Table<T, ?> table) {
 
-        T value = ParserCompiler.getParser(table.getRecordType()).newInstance();
+        T value = DynamoConverter.getConverter(table.getRecordType()).newInstance();
 
         value.setDsl(this);
         value.setTable(table);

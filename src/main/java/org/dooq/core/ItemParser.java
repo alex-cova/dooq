@@ -2,7 +2,8 @@ package org.dooq.core;
 
 import org.dooq.api.AbstractRecord;
 import org.dooq.api.Column;
-import org.dooq.engine.ParserCompiler;
+import org.dooq.api.DynamoConverter;
+import org.dooq.parser.ParserCompiler;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -68,7 +69,7 @@ public class ItemParser {
             return null;
         }
 
-        return ParserCompiler.getParser(type)
-                .parse(map);
+        return DynamoConverter.getConverter(type)
+                .read(map);
     }
 }

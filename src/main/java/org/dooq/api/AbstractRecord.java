@@ -1,7 +1,7 @@
 package org.dooq.api;
 
 import org.dooq.core.exception.DeserializationException;
-import org.dooq.engine.ParserCompiler;
+import org.dooq.parser.ParserCompiler;
 import org.dooq.DynamoSL;
 import org.dooq.Key;
 import org.jetbrains.annotations.ApiStatus;
@@ -77,7 +77,7 @@ public abstract class AbstractRecord<T extends AbstractRecord<T>> {
 
     public final <K> @NotNull K into(Class<K> type) {
 
-        var instance = ParserCompiler.getParser(type).newInstance();
+        var instance = DynamoConverter.getConverter(type).newInstance();
 
         var fieldsMap = Arrays.stream(type.getDeclaredFields())
                 .filter(a -> !Modifier.isTransient(a.getModifiers()) && !a.isAnnotationPresent(Transient.class))

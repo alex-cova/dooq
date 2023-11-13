@@ -1,4 +1,4 @@
-import org.dooq.engine.ParserCompiler;
+import org.dooq.api.DynamoConverter;
 import org.dooq.test.ProductsRecord;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -7,7 +7,7 @@ public class ParserTest {
 
     @Test
     void name() {
-        var parser = ParserCompiler.getParser(ProductsRecord.class);
+        var parser = DynamoConverter.getConverter(ProductsRecord.class);
 
         var record = new ProductsRecord()
                 .setPartition("partition")
@@ -21,7 +21,7 @@ public class ParserTest {
             System.out.println(s);
         }
 
-        var newRecord = parser.parse(result);
+        var newRecord = parser.read(result);
 
         Assertions.assertEquals(record.getPartition(), newRecord.getPartition());
         Assertions.assertEquals(record.getSort(), newRecord.getSort());
