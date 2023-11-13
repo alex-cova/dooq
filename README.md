@@ -1,21 +1,26 @@
 # DOOQ (Preview)
 
-DynamoDB Object Oriented Query
+DynamoDB Object-Oriented Query
 
-Features:
+**Features:**
 
 - Optimized read operations
 - Limitations-aware queries
 - Intelligent query builder
 - Declarative syntax
 - Zero-cost item to class parsing
+- Automatic Schema generation
 
-
+```
+implementation("org.dooq:dooq:1.0.0-SNAPSHOT")
+annotationProcessor("org.dooq:dooq-processor:1.0.0-SNAPSHOT")
+```
 
 # DynamoDSL
 
-A domain specific language for DynamoDB, it uses a table specification to made read optimizations at runtime,
-however it can be used without the schema definition.
+A domain specific language for DynamoDB, it uses a table specification which is auto-generated
+by the annotation processor and is used to made read optimizations and validations
+at runtime, however it can be used without the schema definition.
 
 Inspired on JOOQ, running on top of
 the [DynamoDB low level API](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Programming.LowLevelAPI.html)
@@ -29,7 +34,7 @@ Based on: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Dynam
 ```java
 
 @DynamoDBTable(tableName = "ProductCatalog")
-public static class CatalogItem {
+public class CatalogItem {
     private Integer id;
     private String title;
     private String ISBN;
@@ -55,48 +60,15 @@ public static class CatalogItem {
 **DynamoDSL**
 
 ```java
-public class CatalogItemKey extends Key {
-    public static CatalogItemKey of(Integer id) {
-        var key = new CatalogItemKey();
-        key.setPartitionKey(CatalogItem.ID, id);
-        return key;
-    }
-}
-```
 
-```java
-public class CatalogItem extends AbstractRecord<CatalogItem> {
+@DynamoDBTable("ProductCatalog")
+public class CatalogItem {
     @PartitionKey
     private Integer id;
     private String title;
     private String ISBN;
     private Set<String> bookAuthors;
 
-    //Getters & Setters...
-    //DBAttributeNames annotations not needed
-}
-```
-
-```java
-public class CatalogItem implements Table<CatalogItem, CatalogItemKey>, Column<CatalogItem, CatalogItemKey> {
-
-    public final Field<String, CatalogItemRecord, CatalogItemKey> ID = FieldBuilder.partition("id", String.class, this);
-    public final Field<String, CatalogItemRecord, CatalogItemKey> DESCRIPTION = FieldBuilder.of("title", String.class, this);
-    public final Field<String, CatalogItemRecord, CatalogItemKey> DESCRIPTION = FieldBuilder.of("ISBN", String.class, this);
-    public final Field<String, CatalogItemRecord, CatalogItemKey> DESCRIPTION = FieldBuilder.of("bookAuthors", String.class, this);
-
-    private static final Map<String, Index> INDIXES;
-
-    static {
-        INDIXES = Index.Builder(this)
-                .localOnlyKeys(TITLE)
-                .build();
-    }
-
-    @Override
-    String getTableName() {
-        return "ProductCatalog";
-    }
 }
 ```
 
@@ -107,8 +79,6 @@ public class CatalogItem implements Table<CatalogItem, CatalogItemKey>, Column<C
 create another table specification reusing the table name, at the end what defines the structure is what We call, the
 item or the **record** class.
 
-> Remainder: Table schema is not needed to use DynamoDSL, it's only a way to optimize the queries at runtime.
-
 ## Store
 
 **DynamoDB-Mapper**
@@ -118,7 +88,7 @@ item or the **record** class.
         item.setId(601);
         item.setTitle("Book 601");
         item.setISBN("611-1111111111");
-        item.setBookAuthors(new HashSet<String>(Arrays.asList("Author1","Author2")));
+        item.setBookAuthors(Set.of("Author1","Author2"));
 
 // Save the item (book).
         DynamoDBMapper mapper=new DynamoDBMapper(client);
@@ -131,13 +101,12 @@ item or the **record** class.
 **DynamoDSL**
 
 ```java
-var record=dsl.newRecord(CatalogItem.class);
 
-        record.setId(601);
-        record.setTitle("Book 601");
-        record.setISBN("611-1111111111");
-        record.setBookAuthors(new HashSet<String>(Arrays.asList("Author1","Author2")));
-        record.store();
+dsl.newRecord(Tables.PRODUCTCATALOG).setId(601);
+        .setTitle("Book 601");
+        .setISBN("611-1111111111");
+        .setBookAuthors(Set.of("Author1","Author2"));
+        .store();
 ```
 
 or
@@ -163,6 +132,14 @@ CatalogItem itemRetrieved=mapper.load(CatalogItem.class,601);
 CatalogItem itemRetrieved=dsl.selectFrom(CATALOGITEM)
         .withKey(CatalogItemKey.of(601))
         .fetch();
+```
+
+or
+
+```java
+CatalogItem itemRetrieved=dsl.selectFrom(CATALOGITEM)
+        .where(CATALOGITEM.ID.eq(601))
+        .fetchOne();
 ```
 
 > The parameter of method withKey specs CatalogItemKey type only, and fetch only returns the table record type

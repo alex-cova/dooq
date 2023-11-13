@@ -57,6 +57,18 @@ public class TableAnnotationProcessor extends AbstractProcessor {
         return false;
     }
 
+    private String getTableName(Element element) {
+        var annot = element.getAnnotation(DynamoDBTable.class);
+
+        var tableName = annot.value();
+
+        if (!annot.context().isEmpty()) {
+            tableName = annot.context();
+        }
+
+        return tableName;
+    }
+
     private Table process(Element element) {
 
         if (element.getKind() != ElementKind.CLASS) {
@@ -69,7 +81,6 @@ public class TableAnnotationProcessor extends AbstractProcessor {
                 .getPackageOf(element)
                 .toString();
 
-        var annot = element.getAnnotation(DynamoDBTable.class);
 
         var localIndices = element.getAnnotation(LocalIndices.class);
         var globalIndices = element.getAnnotation(GlobalIndices.class);
@@ -88,7 +99,7 @@ public class TableAnnotationProcessor extends AbstractProcessor {
                 .append("import java.util.Map;\n")
                 .append("\n\n");
 
-        final var tableName = annot.value();
+        final var tableName = getTableName(element);
         final var recordName = tableName + "Record";
         final var keyName = tableName + "Key";
 
@@ -253,7 +264,7 @@ public class TableAnnotationProcessor extends AbstractProcessor {
 
         var annot = element.getAnnotation(DynamoDBTable.class);
 
-        final var className = annot.value() + "Record";
+        final var className = getTableName(element) + "Record";
 
         builder.append("import org.dooq.api.*;\n")
                 .append("import org.dooq.Key;\n\n")
@@ -308,7 +319,7 @@ public class TableAnnotationProcessor extends AbstractProcessor {
                 methodName = methodName.substring(0, 1).toUpperCase() +
                         methodName.substring(1);
 
-                setBuilder.append("\tpublic void set")
+                setBuilder.append("\tpublic %s set".formatted(className))
                         .append(methodName)
                         .append("(")
                         .append(fieldElement.asType().toString())
@@ -320,29 +331,30 @@ public class TableAnnotationProcessor extends AbstractProcessor {
                         .append(" = ")
                         .append(fieldElement.getSimpleName().toString())
                         .append(";\n")
+                        .append("\t\treturn this;\n")
                         .append("\t}\n\n");
 
-                getBuilder.append("\t\tpublic ")
+                getBuilder.append("\tpublic ")
                         .append(fieldElement.asType().toString())
                         .append(" get")
                         .append(methodName)
                         .append("() {\n")
-                        .append("\t\t\t return this.")
+                        .append("\t\treturn this.")
                         .append(fieldElement.getSimpleName().toString())
                         .append(";\n")
-                        .append("\t\t}\n\n");
+                        .append("\t}\n\n");
 
             }
         }
 
-        builder.append("\npublic ")
+        builder.append("\n\tpublic ")
                 .append(className)
                 .append("() {\n")
-                .append("}\n\n");
+                .append("\t}\n\n");
 
         builder.append("""
-                @Override
-                public Key getKey() {
+                    @Override
+                    public Key getKey() {
                 """);
 
         if (sort != null) {
@@ -387,9 +399,9 @@ public class TableAnnotationProcessor extends AbstractProcessor {
     }
          */
 
-        var annot = element.getAnnotation(DynamoDBTable.class);
 
-        final var className = annot.value() + "Key";
+        final var tableName = getTableName(element);
+        final var className = tableName + "Key";
 
         builder.append("import org.dooq.api.*;\n")
                 .append("import org.dooq.Key;\n\n")
@@ -420,7 +432,7 @@ public class TableAnnotationProcessor extends AbstractProcessor {
                 .append("();\n\n");
 
         builder.append("\tmap.setPartitionKey(Tables.")
-                .append(annot.value().toUpperCase())
+                .append(tableName.toUpperCase())
                 .append(".")
                 .append(partition.getSimpleName().toString().toUpperCase())
                 .append(", ")
@@ -429,7 +441,7 @@ public class TableAnnotationProcessor extends AbstractProcessor {
 
         if (sort != null) {
             builder.append("\tmap.setSortingKey(Tables.")
-                    .append(annot.value().toUpperCase())
+                    .append(tableName.toUpperCase())
                     .append(".")
                     .append(sort.getSimpleName().toString().toUpperCase())
                     .append(", ")

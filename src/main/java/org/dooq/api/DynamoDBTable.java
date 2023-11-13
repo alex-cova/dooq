@@ -10,4 +10,7 @@ import java.lang.annotation.Target;
 public @interface DynamoDBTable {
 
     String value();
+
+    String context() default "";
+
 }

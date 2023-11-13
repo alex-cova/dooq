@@ -1,5 +1,8 @@
 package org.dooq.engine;
 
+import org.dooq.api.ColumnAlias;
+import org.dooq.api.PartitionKey;
+import org.dooq.api.SortKey;
 import org.dooq.core.FilteredMap;
 import org.dooq.core.ObjectParser;
 import org.dooq.util.ReflectionUtils;
@@ -57,7 +60,7 @@ public class ParserCompiler extends ClassLoader {
             }
         }
 
-        return super.defineClass("com.dooq.engine." + name, bytecode, 0, bytecode.length);
+        return super.defineClass("org.dooq.engine." + name, bytecode, 0, bytecode.length);
     }
 
     @SuppressWarnings("unchecked")
@@ -215,10 +218,33 @@ public class ParserCompiler extends ClassLoader {
 
             stacks += 2;
 
-            computeWriter(visitor, field.getName(), field.getType(), getMethod, type, ReflectionUtils.getGenericType(field));
+            computeWriter(visitor, getColumnName(field), field.getType(), getMethod, type, ReflectionUtils.getGenericType(field));
         }
 
         return stacks;
+    }
+
+    private static String getColumnName(@NotNull Field field) {
+        var columnName = field.getName();
+        String alias = "";
+
+        if (field.isAnnotationPresent(ColumnAlias.class)) {
+            alias = field.getAnnotation(ColumnAlias.class).value();
+        }
+
+        if (field.isAnnotationPresent(PartitionKey.class)) {
+            alias = field.getAnnotation(PartitionKey.class).alias();
+        }
+
+        if (field.isAnnotationPresent(SortKey.class)) {
+            alias = field.getAnnotation(SortKey.class).alias();
+        }
+
+        if (!alias.isEmpty()) {
+            columnName = alias;
+        }
+
+        return columnName;
     }
 
     private static void computeWriter(MethodVisitor visitor, String name,
@@ -596,14 +622,15 @@ public class ParserCompiler extends ClassLoader {
                     continue;
                 }
 
-                //Debería manejar el autoboxing...
+                //TODO handle autoboxing
                 if (setMethod.getParameterTypes()[0] != field.getType()) {
-                    throw new IllegalStateException("Incorrect mutator parameter type: '%s' expected '%s' from field".formatted(setMethod.getParameterTypes()[0], field.getType()));
+                    throw new IllegalStateException("Incorrect mutator parameter type: '%s' expected '%s' from field"
+                            .formatted(setMethod.getParameterTypes()[0], field.getType()));
                 }
 
                 stacks += 2;
 
-                compute(visitor, field.getName(), field.getType(), setMethod, type, ReflectionUtils.getGenericType(field));
+                compute(visitor, getColumnName(field), field.getType(), setMethod, type, ReflectionUtils.getGenericType(field));
             }
         }
 

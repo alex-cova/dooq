@@ -3,7 +3,7 @@ plugins {
     id("maven-publish")
 }
 
-group = "org.example"
+group = "org.dooq"
 version = "1.0"
 
 repositories {
@@ -24,14 +24,24 @@ tasks.test {
 }
 
 publishing {
+
     publications.create<MavenPublication>("maven") {
 
         groupId = "org.dooq"
-        artifactId = "processor"
+        artifactId = "dooq-processor"
         version = "1.0.0-SNAPSHOT"
 
         from(components["java"])
     }
 
-
+    repositories {
+        maven {
+            name = "Github"
+            url = uri("https://maven.pkg.github.com/alex-cova/dooq")
+            credentials {
+                username = System.getenv("MAVEN_USER")
+                password = System.getenv("MAVEN_SECRET")
+            }
+        }
+    }
 }
