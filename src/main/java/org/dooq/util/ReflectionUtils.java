@@ -1,9 +1,15 @@
 package org.dooq.util;
 
+import org.dooq.api.ColumnAlias;
+import org.dooq.api.PartitionKey;
+import org.dooq.api.SortKey;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -12,6 +18,51 @@ import java.util.stream.Collectors;
  * @author alex
  */
 public class ReflectionUtils {
+
+    public static Map<String, Field> mapFields(@NotNull Class<?> clazz) {
+
+        final boolean notARecord = clazz.isRecord();
+
+        return Arrays.stream(clazz.getDeclaredFields())
+                .filter(field -> {
+
+                    if (Modifier.isStatic(field.getModifiers())) {
+                        return false;
+                    }
+
+                    if (Modifier.isTransient(field.getModifiers())) {
+                        return false;
+                    }
+
+                    if (Modifier.isNative(field.getModifiers())) {
+                        return false;
+                    }
+
+                    if (notARecord) {
+                        return !Modifier.isFinal(field.getModifiers());
+                    }
+
+                    return true;
+                })
+                .collect(Collectors.toMap(ReflectionUtils::getColumnName, c -> c));
+    }
+
+    public static String getColumnName(@NotNull Field field) {
+
+        if (field.isAnnotationPresent(ColumnAlias.class)) {
+            return field.getAnnotation(ColumnAlias.class).value();
+        }
+
+        if (field.isAnnotationPresent(PartitionKey.class)) {
+            return field.getAnnotation(PartitionKey.class).alias();
+        }
+
+        if (field.isAnnotationPresent(SortKey.class)) {
+            return field.getAnnotation(SortKey.class).alias();
+        }
+
+        return field.getName();
+    }
 
     public static boolean hasDiamondInterface(@NotNull Field field) {
         return field.getGenericType().getTypeName().contains("<");
@@ -68,11 +119,6 @@ public class ReflectionUtils {
         }
     }
 
-    public static Map<String, Field> mapFields(@NotNull Class<?> clazz) {
-        return Arrays.stream(clazz.getDeclaredFields())
-                .collect(Collectors.toMap(Field::getName, b -> b));
-    }
-
 
     public static boolean hasInterface(@NotNull Class<?> target, @NotNull Class<?> inter) {
 
@@ -87,4 +133,19 @@ public class ReflectionUtils {
         return Arrays.asList(target.getInterfaces()).contains(inter);
     }
 
+    @SuppressWarnings("unchecked")
+    public static <K> @NotNull K newInstance(@NotNull Class<K> type) {
+
+        try {
+            for (Constructor<?> constructor : type.getDeclaredConstructors()) {
+                if (constructor.getParameterCount() == 0) {
+                    return (K) constructor.newInstance();
+                }
+            }
+        } catch (Exception ex) {
+            throw new IllegalArgumentException(ex);
+        }
+
+        throw new IllegalArgumentException("No default constructor found for " + type);
+    }
 }

@@ -1,7 +1,7 @@
 package org.dooq.parser;
 
-import org.dooq.api.DynamoIgnore;
 import org.dooq.api.ColumnAlias;
+import org.dooq.api.DynamoIgnore;
 import org.dooq.api.PartitionKey;
 import org.dooq.api.SortKey;
 import org.jetbrains.annotations.ApiStatus;
@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -33,10 +34,10 @@ import static org.objectweb.asm.Opcodes.*;
 @ApiStatus.Experimental
 public class ParserCompiler extends ClassLoader {
 
-    public static boolean DEBUG = System.getProperty("dooq.converter.debug", "false").equalsIgnoreCase("true");
-
+    public static boolean DEBUG = System.getProperty("dooq.converter.debug", "false")
+            .equalsIgnoreCase("true");
     private static final ParserCompiler INSTANCE = new ParserCompiler();
-    private final Map<Class<?>, ConverterStruct> converterMap = new HashMap<>();
+    private final Map<Class<?>, ConverterStruct> converterMap = new ConcurrentHashMap<>();
 
     private ParserCompiler() {
         super("ParserCompiler", Thread.currentThread().getContextClassLoader());
