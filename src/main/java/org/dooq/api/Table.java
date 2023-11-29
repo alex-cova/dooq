@@ -3,7 +3,7 @@ package org.dooq.api;
 
 import org.dooq.Key;
 import org.dooq.core.schema.Index;
-import org.dooq.join.JoinExpression;
+import org.dooq.join.MergeExpression;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,7 +22,7 @@ public interface Table<R extends AbstractRecord<R>, K extends Key> {
     Column<R, K> getSortColumn();
 
     @ApiStatus.Experimental
-    default <A extends AbstractRecord<A>, B extends Key> JoinExpression<A, B> on(JoinExpression<A, B> expression) {
+    default MergeExpression<?> on(MergeExpression<?> expression) {
         return expression;
     }
 

@@ -8,8 +8,13 @@ import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.*;
 import java.io.Writer;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.logging.Logger;
 
 @SupportedAnnotationTypes("org.dooq.api.DynamoDBTable")
@@ -69,6 +74,18 @@ public class TableAnnotationProcessor extends AbstractProcessor {
         return tableName;
     }
 
+    private String getBoxType(String type) {
+        if (type.equals("boolean")) return Boolean.class.getName();
+        if (type.equals("int")) return Integer.class.getName();
+        if (type.equals("long")) return Long.class.getName();
+        if (type.equals("short")) return Short.class.getName();
+        if (type.equals("byte")) return Byte.class.getName();
+        if (type.equals("float")) return Float.class.getName();
+        if (type.equals("double")) return Double.class.getName();
+
+        return type;
+    }
+
     private String buildField(VariableElement fieldElement, String columnName) {
 
         var builder = new StringBuilder();
@@ -113,15 +130,50 @@ public class TableAnnotationProcessor extends AbstractProcessor {
             System.out.println("Missing: " + type);
         }
 
-        builder.append("FieldBuilder.of(\"")
-                .append(columnName)
+        if (type.startsWith(String.class.getName())) {
+            builder.append("FieldBuilder.ofString(\"");
+        } else if (isNumber(type)) {
+            builder.append("FieldBuilder.ofNumber(\"");
+        } else if (type.startsWith(boolean.class.getName()) || type.startsWith(Boolean.class.getName())) {
+            builder.append("FieldBuilder.ofBoolean(\"");
+        } else {
+            builder.append("FieldBuilder.of(\"");
+        }
+
+        builder.append(columnName)
                 .append("\", ")
-                .append(type)
+                .append(getBoxType(type))
                 .append(".class, this);\n");
 
 
         return builder.toString();
 
+    }
+
+    private String getFieldType(String type) {
+        if (type.startsWith(String.class.getName())) return "StringField";
+        if (type.startsWith(boolean.class.getName()) || type.startsWith(Boolean.class.getName())) return "BooleanField";
+        if (isNumber(type)) return "NumberField";
+
+        return "Field";
+    }
+
+    private boolean isNumber(String clazz) {
+        if (clazz.startsWith(int.class.getName())) return true;
+        if (clazz.startsWith(long.class.getName())) return true;
+        if (clazz.startsWith(short.class.getName())) return true;
+        if (clazz.startsWith(byte.class.getName())) return true;
+        if (clazz.startsWith(float.class.getName())) return true;
+        if (clazz.startsWith(double.class.getName())) return true;
+        if (clazz.startsWith(Integer.class.getName())) return true;
+        if (clazz.startsWith(Long.class.getName())) return true;
+        if (clazz.startsWith(Short.class.getName())) return true;
+        if (clazz.startsWith(Byte.class.getName())) return true;
+        if (clazz.startsWith(Float.class.getName())) return true;
+        if (clazz.startsWith(Double.class.getName())) return true;
+        if (clazz.startsWith(BigDecimal.class.getName())) return true;
+
+        return clazz.startsWith(BigInteger.class.getName());
     }
 
     private Table process(Element element) {
@@ -208,8 +260,12 @@ public class TableAnnotationProcessor extends AbstractProcessor {
                     columnName = fieldElement.getAnnotation(org.dooq.api.ColumnAlias.class).value();
                 }
 
-                builder.append("\tpublic final Field<")
-                        .append(fieldElement.asType().toString())
+                final var type = fieldElement.asType().toString();
+
+                builder.append("\tpublic final ")
+                        .append(getFieldType(type))
+                        .append("<")
+                        .append(getBoxType(type))
                         .append(", ")
                         .append(recordName)
                         .append(", ")

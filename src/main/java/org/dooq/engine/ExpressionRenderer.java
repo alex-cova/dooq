@@ -2,9 +2,11 @@ package org.dooq.engine;
 
 import org.dooq.Key;
 import org.dooq.api.AbstractRecord;
+import org.dooq.api.BooleanField;
 import org.dooq.api.Column;
 import org.dooq.api.ColumnType;
 import org.dooq.expressions.CompoundExpression;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 
@@ -67,12 +69,16 @@ public interface ExpressionRenderer<R extends AbstractRecord<R>, K extends Key> 
                 .anyMatch(a -> a.isKey(index));
     }
 
-    default CompoundExpression<R, K> and(ExpressionRenderer<R, K> renderer) {
+    default CompoundExpression<R, K> and(@NotNull ExpressionRenderer<R, K> renderer) {
         return new CompoundExpression<>(this)
                 .and(renderer);
     }
 
-    default CompoundExpression<R, K> or(ExpressionRenderer<R, K> renderer) {
+    default CompoundExpression<R, K> and(@NotNull BooleanField<?, R, K> column) {
+        return and(column.isTrue());
+    }
+
+    default CompoundExpression<R, K> or(@NotNull ExpressionRenderer<R, K> renderer) {
         return new CompoundExpression<>(this)
                 .or(renderer);
     }

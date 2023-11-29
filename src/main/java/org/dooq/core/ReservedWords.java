@@ -3,6 +3,7 @@ package org.dooq.core;
 import org.dooq.Key;
 import org.dooq.api.AbstractRecord;
 import org.dooq.api.Column;
+import org.dooq.api.Semantics;
 import org.dooq.util.EscapedProjection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -607,7 +608,7 @@ public class ReservedWords {
 
     public static String escape(String value) {
         if (isReserved(value)) {
-            return "#" + value;
+            return Semantics.HASH + value;
         }
 
         return value;

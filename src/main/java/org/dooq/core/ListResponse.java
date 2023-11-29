@@ -1,8 +1,8 @@
 package org.dooq.core;
 
+import org.dooq.Key;
 import org.dooq.api.AbstractRecord;
 import org.dooq.api.Column;
-import org.dooq.Key;
 import org.dooq.api.DynamoConverter;
 import org.dooq.api.Table;
 import org.jetbrains.annotations.Contract;
@@ -32,7 +32,7 @@ public interface ListResponse<R extends AbstractRecord<R>, K extends Key> extend
         return oneInto(getTable().getRecordType());
     }
 
-    default <T> List<T> into(Class<T> type) {
+    default <T> @NotNull List<T> into(Class<T> type) {
 
         if (isEmpty()) return Collections.emptyList();
 

@@ -12,8 +12,8 @@ public class JoinTest {
 
         dsl.selectFrom(Tables.PRODUCT)
                 .lateJoin(Tables.MIXER.on(Tables.MIXER.UUID.startsWith(Tables.PRODUCT.UUID))
-                        .samePartition())
-                .where(Tables.PRODUCT.CONTENTID.eq(123))
+                        .and(Tables.MIXER.CONTENTID.eq(Tables.PRODUCT.DEPARTMENTID)))
+                .where(Tables.PRODUCT.CONTENTID.eq(123L))
                 .limit(20)
                 .fetch();
     }
@@ -22,7 +22,7 @@ public class JoinTest {
     void testSimpleEagerJoin() {
         dsl.selectFrom(Tables.PRODUCT)
                 .join(Tables.MIXER)
-                .where(Tables.PRODUCT.CONTENTID.eq(123))
+                .where(Tables.PRODUCT.CONTENTID.eq(123L))
                 .limit(20)
                 .fetch();
     }
@@ -30,9 +30,8 @@ public class JoinTest {
     @Test
     void testComplexEagerJoin() {
         dsl.selectFrom(Tables.PRODUCT)
-                .join(dsl.selectFrom(Tables.MIXER)
-                        .where(Tables.MIXER.CONTENTID.eq(Tables.PRODUCT.CONTENTID)))
-                .where(Tables.PRODUCT.CONTENTID.eq(123))
+                .join(Tables.MIXER.on(Tables.MIXER.CONTENTID.eq(Tables.PRODUCT.DEPARTMENTID)))
+                .where(Tables.PRODUCT.CONTENTID.eq(123L))
                 .limit(20)
                 .fetch();
     }

@@ -17,5 +17,6 @@ public class ExampleTable {
     private String sku;
     @ColumnAlias("categoryId")
     private String categoryUuid;
+    private boolean saleable;
 
 }

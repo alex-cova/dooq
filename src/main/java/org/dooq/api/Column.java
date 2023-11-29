@@ -1,11 +1,9 @@
 package org.dooq.api;
 
+import org.dooq.Key;
 import org.dooq.core.DynamoSemantics;
 import org.dooq.engine.ExpressionRenderer;
-import org.dooq.Key;
 import org.dooq.expressions.*;
-import org.dooq.join.EqualsColumnExpression;
-import org.dooq.join.JoinExpression;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -55,13 +53,6 @@ public interface Column<R extends AbstractRecord<R>, K extends Key> {
         return DynamoSemantics.param(this);
     }
 
-    default ExpressionRenderer<R, K> startsWith(String value) {
-        return new BeginsWithExpression<>(this, value);
-    }
-
-    default <A extends AbstractRecord<A>, B extends Key> JoinExpression<A, B> startsWith(Column<A, B> column) {
-        return new EqualsColumnExpression<>(this, column);
-    }
 
     default ExpressionRenderer<R, K> attributeExists() {
         return new AttributeExistsExpression<>(this);
@@ -75,8 +66,16 @@ public interface Column<R extends AbstractRecord<R>, K extends Key> {
         return new ContainsExpression<>(this, value);
     }
 
-    default ExpressionRenderer<R, K> eq(Object obj) {
-        return new ConditionExpression<>(this, Comparator.EQUALS, obj);
+    default ExpressionRenderer<R, K> isTypeOf(AttributeType type) {
+        return new AttributeTypeExpression<>(this, type);
+    }
+
+    default ExpressionRenderer<R, K> isNull() {
+        return new NullComparisonExpression<>(this);
+    }
+
+    default ExpressionRenderer<R, K> isNotNull() {
+        return new NullComparisonExpression<>(this, true);
     }
 
     default ExpressionRenderer<R, K> lessThan(Object obj) {
@@ -97,15 +96,6 @@ public interface Column<R extends AbstractRecord<R>, K extends Key> {
 
     default BetweenExpression.PreBetweenExpression<R, K> between(Object a) {
         return new BetweenExpression.PreBetweenExpression<>(this, a);
-    }
-
-
-    default BooleanComparison<R, K> isTrue() {
-        return new BooleanComparison<>(this);
-    }
-
-    default BooleanComparison<R, K> isFalse() {
-        return new BooleanComparison<>(this, false);
     }
 
     default <T> InExpression<T, R, K> in(List<T> values) {

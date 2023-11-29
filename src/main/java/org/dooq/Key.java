@@ -2,6 +2,7 @@ package org.dooq;
 
 import org.dooq.api.AbstractRecord;
 import org.dooq.api.Column;
+import org.dooq.api.Semantics;
 import org.dooq.core.AttributeWriter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -80,7 +81,7 @@ public class Key extends HashMap<String, AttributeValue> {
         Objects.requireNonNull(value, "Value for sort key can't be null");
         Objects.requireNonNull(value, "Value2 for sort key can't be null");
 
-        var key = value + "#" + value2;
+        var key = value + Semantics.HASH + value2;
 
         setSortingKey(column.name(), key);
 
@@ -91,7 +92,7 @@ public class Key extends HashMap<String, AttributeValue> {
         Objects.requireNonNull(value, "Value for partition key can't be null");
         Objects.requireNonNull(value, "Value2 for partition key can't be null");
 
-        var key = value + "#" + value2;
+        var key = value + Semantics.HASH + value2;
 
         setPartitionKey(column.name(), key);
 

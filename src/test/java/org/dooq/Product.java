@@ -1,10 +1,7 @@
 package org.dooq;
 
+import org.dooq.api.*;
 import org.dooq.core.schema.Index;
-import org.dooq.api.Column;
-import org.dooq.api.Field;
-import org.dooq.api.FieldBuilder;
-import org.dooq.api.Table;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -13,7 +10,7 @@ import java.util.Set;
 
 public class Product implements Table<ProductRecord, ProductKey> {
 
-    public final Field<String, ProductRecord, ProductKey> UUID = FieldBuilder.sort("uuid", String.class, this);
+    public final StringField<String, ProductRecord, ProductKey> UUID = FieldBuilder.sort("uuid", String.class, this);
     public final Field<Long, ProductRecord, ProductKey> CONTENTID = FieldBuilder.partition("contentId", Long.class, this);
     public final Field<Long, ProductRecord, ProductKey> STOCK = FieldBuilder.partition("stock", Long.class, this);
     public final Field<String, ProductRecord, ProductKey> SKU = FieldBuilder.of("sku", String.class, this);

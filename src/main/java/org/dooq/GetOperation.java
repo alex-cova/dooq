@@ -1,16 +1,18 @@
 package org.dooq;
 
 
-import org.dooq.core.DynamoOperation;
-import org.dooq.core.exception.DynamoOperationException;
-import org.dooq.core.response.BufferedGetResponse;
-import org.dooq.util.AbstractColumn;
 import org.dooq.api.AbstractRecord;
 import org.dooq.api.Column;
 import org.dooq.api.Table;
-import org.dooq.engine.ExpressionRenderer;
+import org.dooq.core.DynamoOperation;
 import org.dooq.core.ReservedWords;
 import org.dooq.core.SingleResponse;
+import org.dooq.core.exception.DynamoOperationException;
+import org.dooq.core.response.BufferedGetResponse;
+import org.dooq.engine.ExpressionRenderer;
+import org.dooq.join.JoinExpression;
+import org.dooq.join.TableMergeExpression;
+import org.dooq.util.AbstractColumn;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -29,6 +31,11 @@ public class GetOperation<R extends AbstractRecord<R>, K extends Key> extends Dy
     private Key key;
     private final List<Column<R, K>> columns;
     private boolean debug = false;
+    private @Nullable JoinExpression joinExpression;
+
+    protected List<Column<R, K>> getColumns() {
+        return columns;
+    }
 
     public GetOperation(@NotNull Table<R, K> table, @NotNull List<Column<R, K>> columnList) {
         super(table);
@@ -40,26 +47,33 @@ public class GetOperation<R extends AbstractRecord<R>, K extends Key> extends Dy
     }
 
     @ApiStatus.Experimental
-    public PaginateOperation<R, K> until(ExpressionRenderer<?, ?> renderer) {
+    public PaginateOperation<R, K> until(ExpressionRenderer<?, ?> joinExpression) {
         return new PaginateOperation<>(getTable())
                 .setClient(client);
     }
 
     @ApiStatus.Experimental
-    public GetOperation<R, K> lateJoin(ExpressionRenderer<?, ?> renderer) {
+    public GetOperation<R, K> lateJoin(JoinExpression joinExpression) {
+        this.joinExpression = joinExpression;
         return this;
     }
 
-    public GetOperation<R, K> join(Table<?, ?> table) {
+    @ApiStatus.Experimental
+    public GetOperation<R, K> join(JoinExpression joinExpression) {
+        this.joinExpression = joinExpression;
         return this;
     }
 
-    public GetOperation<R, K> join(GetOperation<?, ?> getOperation) {
+    @ApiStatus.Experimental
+    public GetOperation<R, K> join(Table<?, ?> anotherTable) {
+        this.joinExpression = new TableMergeExpression(anotherTable);
         return this;
     }
 
-    public GetOperation<R, K> join(QueryOperation<?, ?> queryOperation) {
-        return this;
+    public BatchOperation union(GetOperation<?, ?> getOperation) {
+        return new BatchOperation(client)
+                .add(this)
+                .add(getOperation);
     }
 
     public ScanOperation<R, K> scan() {
@@ -178,9 +192,7 @@ public class GetOperation<R extends AbstractRecord<R>, K extends Key> extends Dy
         return execute(client);
     }
 
-    public SingleResponse<R, K> execute(@NotNull DynamoDbClient client) {
-
-
+    protected GetItemRequest build() {
         var pre = builder
                 .key(Objects.requireNonNull(this.key, "Key is not present"));
 
@@ -206,6 +218,13 @@ public class GetOperation<R extends AbstractRecord<R>, K extends Key> extends Dy
         if (operation.key().size() == 1) {
             throw new DynamoOperationException("Partition and Sort Key must be present");
         }
+
+        return operation;
+    }
+
+    public SingleResponse<R, K> execute(@NotNull DynamoDbClient client) {
+
+        var operation = build();
 
         if (debug) {
             System.out.println(operation);

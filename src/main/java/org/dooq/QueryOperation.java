@@ -3,11 +3,11 @@ package org.dooq;
 import org.dooq.api.AbstractRecord;
 import org.dooq.api.Column;
 import org.dooq.api.Table;
+import org.dooq.core.*;
 import org.dooq.core.exception.DynamoOperationException;
 import org.dooq.core.response.BufferedQueryResponse;
 import org.dooq.engine.ExpressionCompiler;
 import org.dooq.engine.ExpressionRenderer;
-import org.dooq.core.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
@@ -20,6 +20,7 @@ import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class QueryOperation<R extends AbstractRecord<R>, K extends Key> extends DynamoOperation<R, K> {
 
@@ -74,7 +75,7 @@ public class QueryOperation<R extends AbstractRecord<R>, K extends Key> extends 
         return this;
     }
 
-    public QueryOperation<R, K> exclusiveStartKey(Key key) {
+    public QueryOperation<R, K> exclusiveStartKey(@Nullable Key key) {
 
         if (key == null) return this;
 
@@ -133,7 +134,15 @@ public class QueryOperation<R extends AbstractRecord<R>, K extends Key> extends 
         return this;
     }
 
-    public List<R> fetch() {
+    public Stream<R> stream() {
+        var items = fetch();
+
+        if (items.isEmpty()) return Stream.empty();
+
+        return items.stream();
+    }
+
+    public @NotNull List<R> fetch() {
         return execute(client)
                 .into(getTable().getRecordType());
     }

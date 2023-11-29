@@ -32,7 +32,7 @@ public class DynamoSLTest {
     void checkQueryGetItemConvert() {
 
         dsl.selectFrom(PRODUCT)
-                .where(PRODUCT.CONTENTID.eq(1)
+                .where(PRODUCT.CONTENTID.eq(1L)
                         .and(PRODUCT.UUID.eq("abcdef")))
                 .fetchOne();
 
@@ -48,9 +48,9 @@ public class DynamoSLTest {
         dsl.delete(ProductKey.of(1, "123"), ProductKey.of(1, "124"), MixerKey.of("1", "125"));
 
         dsl.delete(dsl.deleteFrom(PRODUCT)
-                        .where(PRODUCT.CONTENTID.eq("1")),
+                        .where(PRODUCT.CONTENTID.eq(1L)),
                 dsl.deleteFrom(MIXER)
-                        .where(MIXER.CONTENTID.eq(1)));
+                        .where(MIXER.CONTENTID.eq("1")));
 
         dsl.deleteFrom(PRODUCT)
                 .key(key -> key.partition(1).sort("123"));
@@ -98,7 +98,7 @@ public class DynamoSLTest {
     @Test
     void queryWithFilters() {
         dsl.selectFrom(PRODUCT)
-                .where(PRODUCT.CONTENTID.eq(1)
+                .where(PRODUCT.CONTENTID.eq(1L)
                         .and(PRODUCT.UUID.eq("abcdef"))
                         .and(PRODUCT.CATEGORYID.eq("category")))
                 .fetchOne();
@@ -108,7 +108,7 @@ public class DynamoSLTest {
         final QueryRequest request = client.getLastRequest();
 
         dsl.selectFrom(PRODUCT)
-                .where(PRODUCT.CONTENTID.eq(1)
+                .where(PRODUCT.CONTENTID.eq(1L)
                         .and(PRODUCT.UUID.eq("abcdef")
                                 .and(PRODUCT.CATEGORYID.eq("category"))))
                 .fetchOne();
@@ -122,7 +122,7 @@ public class DynamoSLTest {
     @Test
     void testComplexQuery() {
         dsl.selectFrom(PRODUCT)
-                .where(PRODUCT.CONTENTID.eq(1)
+                .where(PRODUCT.CONTENTID.eq(1L)
                         .and(PRODUCT.UUID.eq("uuid"))
                         .and(PRODUCT.PURCHASEUNITID.in(List.of("salesUnit")))
                         .and(PRODUCT.CATEGORYID.eq("category")
@@ -136,7 +136,7 @@ public class DynamoSLTest {
         System.out.println("---");
 
         dsl.selectFrom(PRODUCT)
-                .where(PRODUCT.CONTENTID.eq(1)
+                .where(PRODUCT.CONTENTID.eq(1L)
                         .and(PRODUCT.UUID.eq("uuid"))
                         .and(PRODUCT.PURCHASEUNITID.in(List.of("salesUnit")))
                         .and(PRODUCT.CATEGORYID.eq("category"))
@@ -150,7 +150,7 @@ public class DynamoSLTest {
     void testFrog() {
 
         List<MixerRecord> frog = dsl.selectFrom(MIXER)
-                .where(MIXER.CONTENTID.eq(1)
+                .where(MIXER.CONTENTID.eq("1")
                         .and(MIXER.UUID.eq("frog")))
                 .consistentRead()
                 .fetch();
@@ -161,7 +161,7 @@ public class DynamoSLTest {
     @Test
     void testComplex2() {
         dsl.selectFrom(PRODUCT)
-                .where(PRODUCT.CONTENTID.eq(1)
+                .where(PRODUCT.CONTENTID.eq(1L)
                         .and(PRODUCT.UUID.eq("uuid"))
                         .and(PRODUCT.PURCHASEUNITID.in(List.of("salesUnit", "purchaseUnit")))
                         .and(PRODUCT.CATEGORYID.eq("category")
@@ -176,7 +176,7 @@ public class DynamoSLTest {
     @Test
     void checkDelete() {
         dsl.deleteFrom(PRODUCT)
-                .where(PRODUCT.CONTENTID.eq(1)
+                .where(PRODUCT.CONTENTID.eq(1L)
                         .and(PRODUCT.UUID.eq("uuid")))
                 .execute();
     }
@@ -191,7 +191,7 @@ public class DynamoSLTest {
     void expressionAttributeValues() {
         dsl.select(PRODUCT.DESCRIPTION)
                 .from(PRODUCT)
-                .where(PRODUCT.CONTENTID.eq(1))
+                .where(PRODUCT.CONTENTID.eq(1L))
                 .fetchInto(String.class);
 
         Map<String, AttributeValue> map = client.getQueryRequest()
@@ -212,7 +212,7 @@ public class DynamoSLTest {
     void missingExpressionName() {
         dsl.fetchExists(dsl.selectFrom(PRODUCT)
                 .onIndex(PRODUCT.DEPARTMENTID)
-                .where(PRODUCT.CONTENTID.eq(1)
+                .where(PRODUCT.CONTENTID.eq(1L)
                         .and(PRODUCT.DEPARTMENTID.eq("uuid"))));
 
         Assertions.assertFalse(client.getQueryRequest().expressionAttributeNames().isEmpty());
@@ -223,14 +223,14 @@ public class DynamoSLTest {
         dsl.selectFrom(PRODUCT)
                 .onIndex(PRODUCT.CATEGORYID)
                 .where(PRODUCT.CATEGORYID.eq("uuid")
-                        .and(PRODUCT.CONTENTID.eq(1)))
+                        .and(PRODUCT.CONTENTID.eq(1L)))
                 .fetchInto(ProductRecord.class);
     }
 
     @Test
     void getFromTransform() {
         dsl.selectFrom(PRODUCT)
-                .where(PRODUCT.UUID.eq("uuid").and(PRODUCT.CONTENTID.eq(1)))
+                .where(PRODUCT.UUID.eq("uuid").and(PRODUCT.CONTENTID.eq(1L)))
                 .execute();
 
         client.assertLastGetItemRequest();
@@ -239,7 +239,7 @@ public class DynamoSLTest {
     void testQueryFrom() {
         dsl.selectFrom(PRODUCT)
                 .onLocalIndex(PRODUCT.CONTENTID)
-                .where(PRODUCT.CONTENTID.eq(1))
+                .where(PRODUCT.CONTENTID.eq(1L))
                 .startingFrom(ProductKey.of(1, "123"))
                 .startingFrom(key -> key.partition(1).sort("absc"))
                 .execute();
@@ -248,7 +248,7 @@ public class DynamoSLTest {
     @Test
     void testBeginsKey() {
         dsl.selectFrom(PRODUCT)
-                .where(PRODUCT.CONTENTID.eq(1)
+                .where(PRODUCT.CONTENTID.eq(1L)
                         .and(PRODUCT.UUID.startsWith("SEL")))
                 .execute();
     }
@@ -256,7 +256,7 @@ public class DynamoSLTest {
     @Test
     void fetchExists() {
         dsl.fetchExists(dsl.selectFrom(PRODUCT)
-                .where(Tables.PRODUCT.CONTENTID.eq(1)
+                .where(Tables.PRODUCT.CONTENTID.eq(1L)
                         .and(PRODUCT.SKU.eq("sku"))));
 
     }
@@ -265,7 +265,7 @@ public class DynamoSLTest {
     void testWhile() {
 
         List<ProductRecord> productRecords = dsl.selectFrom(PRODUCT)
-                .until(PRODUCT.CONTENTID.eq(1))
+                .until(PRODUCT.CONTENTID.eq(1L))
                 .startingFrom(key -> key.partition("1")
                         .sort(1234))
                 .limit(100)

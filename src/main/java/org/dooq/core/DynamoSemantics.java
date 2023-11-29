@@ -1,6 +1,7 @@
 package org.dooq.core;
 
 import org.dooq.api.Column;
+import org.dooq.api.Semantics;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -20,6 +21,6 @@ public class DynamoSemantics {
 
     @Contract(pure = true)
     public static @NotNull String escaped(String value) {
-        return "#" + value;
+        return Semantics.HASH + value;
     }
 }

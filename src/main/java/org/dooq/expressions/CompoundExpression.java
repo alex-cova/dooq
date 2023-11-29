@@ -1,11 +1,11 @@
 package org.dooq.expressions;
 
-import org.dooq.engine.ExpressionRenderer;
-import org.dooq.engine.RendererContext;
 import org.dooq.Key;
 import org.dooq.api.AbstractRecord;
 import org.dooq.api.Column;
 import org.dooq.api.Table;
+import org.dooq.engine.ExpressionRenderer;
+import org.dooq.engine.RendererContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
@@ -37,7 +37,7 @@ public final class CompoundExpression<R extends AbstractRecord<R>, K extends Key
     }
 
     @Override
-    public CompoundExpression<R, K> and(ExpressionRenderer<R, K> expression) {
+    public CompoundExpression<R, K> and(@NotNull ExpressionRenderer<R, K> expression) {
         setLast(Operator.AND);
 
         expressions.add(new InternalExpression<>(expression));
@@ -45,7 +45,7 @@ public final class CompoundExpression<R extends AbstractRecord<R>, K extends Key
     }
 
     @Override
-    public CompoundExpression<R, K> or(ExpressionRenderer<R, K> expression) {
+    public CompoundExpression<R, K> or(@NotNull ExpressionRenderer<R, K> expression) {
         setLast(Operator.OR);
 
         expressions.add(new InternalExpression<>(expression));
