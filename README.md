@@ -25,6 +25,35 @@ at runtime, however it can be used without the schema definition.
 Inspired on JOOQ, running on top of
 the [DynamoDB low level API](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Programming.LowLevelAPI.html)
 
+# The mapper
+
+Generates converter classes (Java 17) for POJOs/Recods at runtime, using ASM.
+
+## Features
+
+* Fast ⚡️
+* Easy to use
+* No reflection used at conversion time
+* Little memory footprint
+* Easy to add additional converters
+* Support for java records
+
+## Benchmark
+
+```
+Benchmark                          Mode  Cnt     Score   Error  Units
+ConverterBenchmark.readBenchmark   avgt    5   635.997 ± 1.419  ns/op
+ConverterBenchmark.writeBenchmark  avgt    5  1071.437 ± 4.250  ns/op
+```
+
+### Requirements
+
+* Target class must have a default constructor
+* Target class must have getters and setters for all fields to parse
+
+if you want to omit some fields, you can use `@DynamoIgnore` annotation or `transient` keyword on field,
+**this doesn't apply to records.**
+
 # Key Differences
 
 Based on: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBMapper.CRUDExample1.html
