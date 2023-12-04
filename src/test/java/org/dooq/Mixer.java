@@ -1,18 +1,18 @@
 package org.dooq;
 
 
-import org.dooq.core.schema.Index;
 import org.dooq.api.Column;
 import org.dooq.api.Field;
 import org.dooq.api.FieldBuilder;
 import org.dooq.api.Table;
+import org.dooq.core.schema.Index;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 @javax.annotation.processing.Generated(value = "org.dooq.processor.TableAnnotationProcessor", date = "tudei")
-public class Mixer implements Table<MixerRecord, MixerKey> {
+public class Mixer extends Table<MixerRecord, MixerKey> {
 
     public final Field<String, MixerRecord, MixerKey> PARENTUUID = FieldBuilder.partition("parentUuid", String.class, this);
     public final Field<String, MixerRecord, MixerKey> UUID = FieldBuilder.sort("uuid", String.class, this);

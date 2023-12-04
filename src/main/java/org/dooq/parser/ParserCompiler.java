@@ -45,7 +45,7 @@ public class ParserCompiler extends ClassLoader {
         converterMap.put(ObjectParser.class, new ConverterStruct(ObjectParser.class));
     }
 
-    private Class<?> defineNewClass(byte[] bytecode, String name) {
+    private @Nullable Class<?> defineNewClass(byte[] bytecode, String name) {
 
         if (DEBUG) {
             try {
@@ -62,7 +62,16 @@ public class ParserCompiler extends ClassLoader {
             }
         }
 
-        return super.defineClass("org.dooq.converter." + name, bytecode, 0, bytecode.length);
+        try {
+            return super.defineClass("org.dooq.converter." + name, bytecode, 0, bytecode.length);
+        } catch (LinkageError error) {
+
+            Logger.getLogger(ParserCompiler.class.getName())
+                    .log(Level.SEVERE, "Failed to load class: " + name, error);
+
+            return null;
+        }
+
     }
 
     public static <T> @NotNull ObjectParser<T> getConverter(@NotNull Class<T> type) {
@@ -805,6 +814,10 @@ public class ParserCompiler extends ClassLoader {
     @SuppressWarnings("unchecked")
     private static <T> @NotNull ObjectParser<T> createObject(byte[] bytecode, @NotNull Class<T> type, @NotNull Class<?> parserClass) {
         var clazz = INSTANCE.defineNewClass(bytecode, type.getSimpleName() + parserClass.getSimpleName());
+
+        if (clazz == null) {
+            throw new RuntimeException("Failed to compile converter for class '%s'".formatted(type));
+        }
 
         try {
             var constructor = clazz.getConstructor();

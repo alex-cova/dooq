@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class ProductNewTest implements Table<ProductRecord, ProductKey> {
+public class ProductNewTest extends Table<ProductRecord, ProductKey> {
 
     public final Field<String, ProductRecord, ProductKey> UUID = FieldBuilder.partitionKey("uuid", String.class, this);
     public final Field<Long, ProductRecord, ProductKey> CONTENTID = FieldBuilder.sortKey("contentId", Long.class, this);

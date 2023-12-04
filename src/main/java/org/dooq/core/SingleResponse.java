@@ -4,6 +4,7 @@ import org.dooq.Key;
 import org.dooq.api.AbstractRecord;
 import org.dooq.api.Column;
 import org.dooq.api.Table;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
@@ -27,10 +28,17 @@ public interface SingleResponse<R extends AbstractRecord<R>, K extends Key> exte
         return function.apply(value);
     }
 
+    @SuppressWarnings("unchecked")
     default <T> @Nullable T into(Class<T> clazz) {
 
         if (isEmpty()) {
             return null;
+        }
+
+        if (clazz == getTable().getRecordType()) {
+            return (T) getTable()
+                    .getRecordParser()
+                    .read(getItem());
         }
 
         return ItemParser.readRecord(getItem(), clazz);
@@ -46,7 +54,8 @@ public interface SingleResponse<R extends AbstractRecord<R>, K extends Key> exte
         return function.apply(attributeValue);
     }
 
-    static <R extends AbstractRecord<R>, K extends Key> ListResponse<R, K> asListResponse(SingleResponse<R, K> response) {
+    @Contract(value = "_ -> new", pure = true)
+    static <R extends AbstractRecord<R>, K extends Key> @NotNull ListResponse<R, K> asListResponse(SingleResponse<R, K> response) {
         return new ListResponse<>() {
             @Override
             public Table<R, K> getTable() {

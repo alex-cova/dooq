@@ -24,12 +24,24 @@ public interface ListResponse<R extends AbstractRecord<R>, K extends Key> extend
 
     List<Map<String, AttributeValue>> getItems();
 
-    default List<R> items() {
-        return into(getTable().getRecordType());
+    default @NotNull List<R> items() {
+
+        if (isEmpty()) return Collections.emptyList();
+
+        var parser = getTable().getRecordParser();
+
+        return getItems().stream()
+                .map(parser::read)
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
-    default R one() {
-        return oneInto(getTable().getRecordType());
+    default @Nullable R one() {
+
+        if (isEmpty()) return null;
+
+        return getTable().getRecordParser()
+                .read(getItems().get(0));
+
     }
 
     default <T> @NotNull List<T> into(Class<T> type) {
@@ -65,6 +77,7 @@ public interface ListResponse<R extends AbstractRecord<R>, K extends Key> extend
     default @NotNull LastEvaluatedKey getLastKey() {
         return new LastEvaluatedKey(lastEvaluatedKey());
     }
+
 
     default <T> @Nullable T oneInto(Class<T> type) {
 

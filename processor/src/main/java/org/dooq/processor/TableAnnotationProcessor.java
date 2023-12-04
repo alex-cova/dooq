@@ -216,7 +216,7 @@ public class TableAnnotationProcessor extends AbstractProcessor {
 
         builder.append("public final class ")
                 .append(tableName)
-                .append(" implements Table<%s, %s>".formatted(recordName, keyName))
+                .append(" extends Table<%s, %s>".formatted(recordName, keyName))
                 .append(" {\n\n");
 
         builder.append("\tpublic ")

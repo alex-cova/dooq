@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class Product implements Table<ProductRecord, ProductKey> {
+public class Product extends Table<ProductRecord, ProductKey> {
 
     public final StringField<String, ProductRecord, ProductKey> UUID = FieldBuilder.sort("uuid", String.class, this);
     public final Field<Long, ProductRecord, ProductKey> CONTENTID = FieldBuilder.partition("contentId", Long.class, this);
