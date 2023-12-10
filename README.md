@@ -104,9 +104,9 @@ item or the **record** class.
 
 dsl.newRecord(Tables.PRODUCTCATALOG)
 	.setId(601)
-        .setTitle("Book 601");
-        .setISBN("611-1111111111");
-        .setBookAuthors(Set.of("Author1","Author2"));
+        .setTitle("Book 601")
+        .setISBN("611-1111111111")
+        .setBookAuthors(Set.of("Author1","Author2"))
         .store();
 ```
 
