@@ -131,10 +131,11 @@ item or the **record** class.
 
 ```java
 
-dsl.newRecord(Tables.PRODUCTCATALOG).setId(601);
-        .setTitle("Book 601");
-        .setISBN("611-1111111111");
-        .setBookAuthors(Set.of("Author1","Author2"));
+dsl.newRecord(Tables.PRODUCTCATALOG)
+	.setId(601)
+        .setTitle("Book 601")
+        .setISBN("611-1111111111")
+        .setBookAuthors(Set.of("Author1","Author2"))
         .store();
 ```
 
@@ -152,13 +153,13 @@ dsl.insertInto(CATALOGINTEM)
 **AWS**
 
 ```java
-CatalogItem itemRetrieved=mapper.load(CatalogItem.class,601);
+CatalogItem itemRetrieved = mapper.load(CatalogItem.class,601);
 ```
 
 **DynamoDSL**
 
 ```java
-CatalogItem itemRetrieved=dsl.selectFrom(CATALOGITEM)
+CatalogItem itemRetrieved = dsl.selectFrom(CATALOGITEM)
         .withKey(CatalogItemKey.of(601))
         .fetch();
 ```
@@ -166,7 +167,7 @@ CatalogItem itemRetrieved=dsl.selectFrom(CATALOGITEM)
 or
 
 ```java
-CatalogItem itemRetrieved=dsl.selectFrom(CATALOGITEM)
+CatalogItem itemRetrieved = dsl.selectFrom(CATALOGITEM)
         .where(CATALOGITEM.ID.eq(601))
         .fetchOne();
 ```
