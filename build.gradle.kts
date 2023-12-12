@@ -23,7 +23,7 @@ dependencies {
     implementation("software.amazon.awssdk:dynamodb:2.21.42")
     implementation("org.ow2.asm:asm:9.5")
 
-    testCompileOnly("org.jetbrains:annotations:23.1.0")
+    testCompileOnly("org.jetbrains:annotations:24.0.1")
 
     testCompileOnly("org.projectlombok:lombok:1.18.30")
     testAnnotationProcessor("org.projectlombok:lombok:1.18.30")
