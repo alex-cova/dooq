@@ -1,15 +1,15 @@
 package org.dooq.expressions;
 
 import org.dooq.Key;
-import org.dooq.api.AbstractRecord;
 import org.dooq.api.Column;
+import org.dooq.api.DynamoRecord;
 import org.dooq.engine.RendererContext;
 import org.dooq.engine.SingleExpressionRenderer;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 
 import java.util.Map;
 
-public class NullComparisonExpression<R extends AbstractRecord<R>, K extends Key> extends SingleExpressionRenderer<R, K> {
+public class NullComparisonExpression<R extends DynamoRecord<R>, K extends Key> extends SingleExpressionRenderer<R, K> {
 
     private boolean negated;
 

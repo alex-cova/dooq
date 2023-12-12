@@ -1,6 +1,6 @@
 package org.dooq;
 
-import org.dooq.api.AbstractRecord;
+import org.dooq.api.DynamoRecord;
 import org.dooq.core.exception.DynamoOperationException;
 import org.dooq.core.response.BufferedUpdateResponse;
 import org.jetbrains.annotations.Contract;
@@ -12,7 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-public final class UpdateReturn<R extends AbstractRecord<R>, K extends Key> {
+public final class UpdateReturn<R extends DynamoRecord<R>, K extends Key> {
     private final UpdateOperation<R, K> updateOperation;
 
     public UpdateReturn(UpdateOperation<R, K> updateOperation) {

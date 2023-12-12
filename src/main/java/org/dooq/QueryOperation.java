@@ -1,13 +1,14 @@
 package org.dooq;
 
-import org.dooq.api.AbstractRecord;
 import org.dooq.api.Column;
+import org.dooq.api.DynamoRecord;
 import org.dooq.api.Table;
 import org.dooq.core.*;
 import org.dooq.core.exception.DynamoOperationException;
 import org.dooq.core.response.BufferedQueryResponse;
 import org.dooq.engine.ExpressionCompiler;
 import org.dooq.engine.ExpressionRenderer;
+import org.dooq.parser.ObjectParser;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
@@ -16,13 +17,14 @@ import software.amazon.awssdk.services.dynamodb.model.QueryRequest;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class QueryOperation<R extends AbstractRecord<R>, K extends Key> extends DynamoOperation<R, K> {
+public class QueryOperation<R extends DynamoRecord<R>, K extends Key> extends DynamoOperation<R, K> {
 
     private QueryRequest.Builder builder;
     private final List<ExpressionRenderer<R, K>> expressionList;
@@ -145,6 +147,23 @@ public class QueryOperation<R extends AbstractRecord<R>, K extends Key> extends 
     public @NotNull List<R> fetch() {
         return execute(client)
                 .into(getTable().getRecordType());
+    }
+
+    public <T> @NotNull List<T> fetch(@NotNull ObjectParser<T> parser) {
+
+        Objects.requireNonNull(parser, "Parser cannot be null");
+
+        return execute(client)
+                .into(parser);
+    }
+
+    public <T> @Nullable T fetchOne(@NotNull ObjectParser<T> parser) {
+
+        Objects.requireNonNull(parser, "Parser cannot be null");
+
+        return limit(1)
+                .execute(client)
+                .one(parser);
     }
 
     public @Nullable R fetchOne() {

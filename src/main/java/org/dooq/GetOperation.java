@@ -1,8 +1,8 @@
 package org.dooq;
 
 
-import org.dooq.api.AbstractRecord;
 import org.dooq.api.Column;
+import org.dooq.api.DynamoRecord;
 import org.dooq.api.Table;
 import org.dooq.core.DynamoOperation;
 import org.dooq.core.ReservedWords;
@@ -12,6 +12,7 @@ import org.dooq.core.response.BufferedGetResponse;
 import org.dooq.engine.ExpressionRenderer;
 import org.dooq.join.JoinExpression;
 import org.dooq.join.TableMergeExpression;
+import org.dooq.parser.ObjectParser;
 import org.dooq.util.AbstractColumn;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -24,7 +25,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 
-public class GetOperation<R extends AbstractRecord<R>, K extends Key> extends DynamoOperation<R, K> {
+public class GetOperation<R extends DynamoRecord<R>, K extends Key> extends DynamoOperation<R, K> {
 
     private GetItemRequest.Builder builder;
     private DynamoDbClient client;
@@ -168,6 +169,11 @@ public class GetOperation<R extends AbstractRecord<R>, K extends Key> extends Dy
     public @Nullable R fetch() {
         return execute()
                 .into(getTable().getRecordType());
+    }
+
+    public <T> @Nullable T fetch(ObjectParser<T> parser) {
+        return execute()
+                .into(parser);
     }
 
     public @Nullable <A> A map(Function<R, A> function) {

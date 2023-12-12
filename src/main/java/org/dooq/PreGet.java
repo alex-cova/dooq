@@ -1,7 +1,7 @@
 package org.dooq;
 
-import org.dooq.api.AbstractRecord;
 import org.dooq.api.Column;
+import org.dooq.api.DynamoRecord;
 import org.dooq.api.Table;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class PreGet<R extends AbstractRecord<R>, K extends Key> {
+public class PreGet<R extends DynamoRecord<R>, K extends Key> {
 
     private final List<Column<R, K>> columnList;
     private DynamoDbClient client;
@@ -27,20 +27,20 @@ public class PreGet<R extends AbstractRecord<R>, K extends Key> {
 
     @SafeVarargs
     @Contract("_ -> new")
-    public static @NotNull <R extends AbstractRecord<R>, K extends Key> PreGet<R, K> get(Column<R, K>... columns) {
+    public static @NotNull <R extends DynamoRecord<R>, K extends Key> PreGet<R, K> get(Column<R, K>... columns) {
         return new PreGet<>(Arrays.asList(columns));
     }
 
-    public static @NotNull <R extends AbstractRecord<R>, K extends Key> PreGet<R, K> get(Column<R, K> column) {
+    public static @NotNull <R extends DynamoRecord<R>, K extends Key> PreGet<R, K> get(Column<R, K> column) {
         return new PreGet<>(Collections.singletonList(column));
     }
 
-    public static @NotNull <R extends AbstractRecord<R>, K extends Key> PreGet<R, K> get(List<Column<R, K>> columns) {
+    public static @NotNull <R extends DynamoRecord<R>, K extends Key> PreGet<R, K> get(List<Column<R, K>> columns) {
         return new PreGet<>(columns);
     }
 
     @Contract("_ -> new")
-    public static <R extends AbstractRecord<R>, K extends Key> GetOperation<R, K> selectFrom(@NotNull Table<R, K> table) {
+    public static <R extends DynamoRecord<R>, K extends Key> GetOperation<R, K> selectFrom(@NotNull Table<R, K> table) {
         return new PreGet<>(table.getColumns())
                 .from(table);
     }

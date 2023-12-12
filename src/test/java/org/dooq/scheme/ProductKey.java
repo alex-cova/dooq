@@ -1,5 +1,6 @@
-package org.dooq;
+package org.dooq.scheme;
 
+import org.dooq.Key;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -7,18 +8,18 @@ import java.util.stream.Collectors;
 
 public class ProductKey extends Key {
 
-    public static @NotNull ProductKey of(long contentId, String productUuid) {
+    public static @NotNull ProductKey of(long companyId, String productUuid) {
         var map = new ProductKey();
 
-        map.setPartitionKey(Tables.PRODUCT.CONTENTID, contentId);
+        map.setPartitionKey(Tables.PRODUCT.COMPANYID, companyId);
         map.setSortingKey(Tables.PRODUCT.UUID, productUuid);
 
         return map;
     }
 
-    public static List<ProductKey> bulk(long contentId, @NotNull List<String> ids) {
+    public static List<ProductKey> bulk(long companyId, @NotNull List<String> ids) {
         return ids.stream()
-                .map(k -> of(contentId, k))
+                .map(k -> of(companyId, k))
                 .collect(Collectors.toList());
     }
 

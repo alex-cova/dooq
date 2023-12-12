@@ -1,7 +1,7 @@
 package org.dooq;
 
-import org.dooq.api.AbstractRecord;
 import org.dooq.api.Column;
+import org.dooq.api.DynamoRecord;
 import org.dooq.api.Semantics;
 import org.dooq.core.AttributeWriter;
 import org.jetbrains.annotations.NotNull;
@@ -114,7 +114,7 @@ public class Key extends HashMap<String, AttributeValue> {
         return this;
     }
 
-    public <R extends AbstractRecord<R>, K extends Key> Key setSortingKey(@Nullable Map<Column<R, K>, Object> map) {
+    public <R extends DynamoRecord<R>, K extends Key> Key setSortingKey(@Nullable Map<Column<R, K>, Object> map) {
 
         if (map == null) return this;
 
@@ -128,7 +128,7 @@ public class Key extends HashMap<String, AttributeValue> {
         return this;
     }
 
-    public <R extends AbstractRecord<R>, K extends Key> Key setPartitionKeyName(@NotNull Map<Column<R, K>, Object> map) {
+    public <R extends DynamoRecord<R>, K extends Key> Key setPartitionKeyName(@NotNull Map<Column<R, K>, Object> map) {
         List<Entry<Column<R, K>, Object>> collect = new ArrayList<>(map.entrySet());
         Entry<Column<R, K>, Object> entry = collect.get(0);
 

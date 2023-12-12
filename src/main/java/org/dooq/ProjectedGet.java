@@ -1,13 +1,13 @@
 package org.dooq;
 
-import org.dooq.api.AbstractRecord;
+import org.dooq.api.DynamoRecord;
 import org.dooq.api.FieldType;
 import org.dooq.api.Table;
 import org.dooq.core.ItemParser;
-import org.dooq.core.exception.DynamoOperationException;
 import org.dooq.core.ReservedWords;
-import org.dooq.projection.Projection;
+import org.dooq.core.exception.DynamoOperationException;
 import org.dooq.engine.ExpressionRenderer;
+import org.dooq.projection.Projection;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
@@ -20,7 +20,7 @@ import java.util.logging.Logger;
 
 @ApiStatus.Experimental
 @SuppressWarnings("rawtypes")
-public class ProjectedGet<T, R extends AbstractRecord<R>, K extends Key> {
+public class ProjectedGet<T, R extends DynamoRecord<R>, K extends Key> {
     private DynamoDbClient client;
     private final Table<R, K> table;
     private final Class<T> type;
@@ -39,37 +39,37 @@ public class ProjectedGet<T, R extends AbstractRecord<R>, K extends Key> {
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public static <T, R extends AbstractRecord<R>, K extends Key> ProjectedGet<Projection.ProjectionResult1<T>, R, K>
+    public static <T, R extends DynamoRecord<R>, K extends Key> ProjectedGet<Projection.ProjectionResult1<T>, R, K>
     of(Table<R, K> table, FieldType<T> field) {
         return (ProjectedGet) new ProjectedGet<>(table, Projection.ProjectionResult1.class, List.of(field));
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public static <f1, f2, R extends AbstractRecord<R>, K extends Key> ProjectedGet<Projection.ProjectionResult2<f1, f2>, R, K>
+    public static <f1, f2, R extends DynamoRecord<R>, K extends Key> ProjectedGet<Projection.ProjectionResult2<f1, f2>, R, K>
     of(Table<?, K> table, FieldType<f1> f1, FieldType<f2> f2) {
         return (ProjectedGet) new ProjectedGet<>(table, Projection.ProjectionResult1.class, List.of(f1, f2));
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public static <f1, f2, f3, R extends AbstractRecord<R>, K extends Key> ProjectedGet<Projection.ProjectionResult3<f1, f2, f3>, R, K>
+    public static <f1, f2, f3, R extends DynamoRecord<R>, K extends Key> ProjectedGet<Projection.ProjectionResult3<f1, f2, f3>, R, K>
     of(Table<?, K> table, FieldType<f1> f1, FieldType<f2> f2, FieldType<f3> f3) {
         return (ProjectedGet) new ProjectedGet<>(table, Projection.ProjectionResult1.class, List.of(f1, f2, f3));
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public static <f1, f2, f3, f4, R extends AbstractRecord<R>, K extends Key> ProjectedGet<Projection.ProjectionResult4<f1, f2, f3, f4>, R, K>
+    public static <f1, f2, f3, f4, R extends DynamoRecord<R>, K extends Key> ProjectedGet<Projection.ProjectionResult4<f1, f2, f3, f4>, R, K>
     of(Table<?, K> table, FieldType<f1> f1, FieldType<f2> f2, FieldType<f3> f3, FieldType<f4> f4) {
         return (ProjectedGet) new ProjectedGet<>(table, Projection.ProjectionResult1.class, List.of(f1, f2, f3, f4));
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public static <f1, f2, f3, f4, f5, R extends AbstractRecord<R>, K extends Key> ProjectedGet<Projection.ProjectionResult5<f1, f2, f3, f4, f5>, R, K>
+    public static <f1, f2, f3, f4, f5, R extends DynamoRecord<R>, K extends Key> ProjectedGet<Projection.ProjectionResult5<f1, f2, f3, f4, f5>, R, K>
     of(Table<?, K> table, FieldType<f1> f1, FieldType<f2> f2, FieldType<f3> f3, FieldType<f4> f4, FieldType<f5> f5) {
         return (ProjectedGet) new ProjectedGet<>(table, Projection.ProjectionResult1.class, List.of(f1, f2, f3, f4, f5));
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public static <f1, f2, f3, f4, f5, f6, R extends AbstractRecord<R>, K extends Key> ProjectedGet<Projection.ProjectionResult6<f1, f2, f3, f4, f5, f6>, R, K>
+    public static <f1, f2, f3, f4, f5, f6, R extends DynamoRecord<R>, K extends Key> ProjectedGet<Projection.ProjectionResult6<f1, f2, f3, f4, f5, f6>, R, K>
     of(Table<?, K> table, FieldType<f1> f1, FieldType<f2> f2, FieldType<f3> f3, FieldType<f4> f4, FieldType<f5> f5, FieldType<f6> f6) {
         return (ProjectedGet) new ProjectedGet<>(table, Projection.ProjectionResult1.class, List.of(f1, f2, f3, f4, f5, f6));
     }

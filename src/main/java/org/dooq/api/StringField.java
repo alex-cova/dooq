@@ -4,7 +4,7 @@ import org.dooq.Key;
 import org.dooq.engine.ExpressionRenderer;
 import org.dooq.expressions.BeginsWithExpression;
 
-public class StringField<T, R extends AbstractRecord<R>, K extends Key> extends Field<T, R, K> {
+public class StringField<T, R extends DynamoRecord<R>, K extends Key> extends Field<T, R, K> {
     public StringField(String name, Class<T> type, Table<R, K> table) {
         super(type, name, ColumnType.NORMAL, false, table);
     }

@@ -1,9 +1,9 @@
 package org.dooq.expressions;
 
-import org.dooq.engine.RendererContext;
 import org.dooq.Key;
-import org.dooq.api.AbstractRecord;
 import org.dooq.api.Column;
+import org.dooq.api.DynamoRecord;
+import org.dooq.engine.RendererContext;
 import org.dooq.engine.SingleExpressionRenderer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
@@ -29,7 +29,7 @@ import java.util.Map;
  * contains (Color, :v_sub)
  * The expression attribute value :v_sub is a placeholder for Red.
  */
-public class ContainsExpression<R extends AbstractRecord<R>, K extends Key> extends SingleExpressionRenderer<R, K> {
+public class ContainsExpression<R extends DynamoRecord<R>, K extends Key> extends SingleExpressionRenderer<R, K> {
 
     private final String value;
 

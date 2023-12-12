@@ -1,6 +1,8 @@
-package org.dooq;
+package org.dooq.mapper;
 
 import org.dooq.core.ItemParser;
+import org.dooq.scheme.ProductRecord;
+import org.dooq.scheme.Tables;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Fork;
 import org.openjdk.jmh.annotations.Warmup;
@@ -20,7 +22,7 @@ public class ObjectMapperPerformance {
     public void name() {
 
         var object = new ProductRecord()
-                .setContentId(1L)
+                .setCompanyId(1L)
                 .setUuid("uuid")
                 .setDescription("Description")
                 .setDetails("details")
@@ -33,7 +35,7 @@ public class ObjectMapperPerformance {
 
         object.setTable(Tables.PRODUCT);
 
-        var result = ItemParser.writeRecord(object);
+        ItemParser.writeRecord(object);
 
     }
 }

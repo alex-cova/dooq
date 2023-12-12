@@ -1,8 +1,8 @@
 package org.dooq.core;
 
 import org.dooq.Key;
-import org.dooq.api.AbstractRecord;
 import org.dooq.api.Column;
+import org.dooq.api.DynamoRecord;
 import org.dooq.api.Semantics;
 import org.dooq.util.EscapedProjection;
 import org.jetbrains.annotations.NotNull;
@@ -614,7 +614,7 @@ public class ReservedWords {
         return value;
     }
 
-    public static <R extends AbstractRecord<R>, K extends Key> @Nullable
+    public static <R extends DynamoRecord<R>, K extends Key> @Nullable
             EscapedProjection escapeProjection(@NotNull List<Column<R, K>> columns) {
 
         return ReservedWords.escape(columns.stream()

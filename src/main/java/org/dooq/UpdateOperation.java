@@ -1,15 +1,15 @@
 package org.dooq;
 
 
-import org.dooq.api.AbstractRecord;
 import org.dooq.api.Column;
+import org.dooq.api.DynamoRecord;
 import org.dooq.api.Table;
+import org.dooq.core.*;
 import org.dooq.core.exception.DynamoOperationException;
 import org.dooq.core.response.BufferedUpdateResponse;
 import org.dooq.engine.ExpressionRenderer;
 import org.dooq.expressions.AddExpression;
 import org.dooq.util.NullableValue;
-import org.dooq.core.*;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -29,7 +29,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-public class UpdateOperation<R extends AbstractRecord<R>, K extends Key> extends DynamoOperation<R, K> {
+public class UpdateOperation<R extends DynamoRecord<R>, K extends Key> extends DynamoOperation<R, K> {
 
     private final Map<String, AttributeValue> attributeValueMap;
     private UpdateItemRequest.Builder builder;
@@ -50,7 +50,7 @@ public class UpdateOperation<R extends AbstractRecord<R>, K extends Key> extends
     }
 
     @Contract(value = "_ -> new", pure = true)
-    public static <R extends AbstractRecord<R>, K extends Key> @NotNull UpdateOperation<R, K> table(Table<R, K> table) {
+    public static <R extends DynamoRecord<R>, K extends Key> @NotNull UpdateOperation<R, K> table(Table<R, K> table) {
         return new UpdateOperation<>(table);
     }
 

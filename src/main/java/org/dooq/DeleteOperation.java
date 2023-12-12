@@ -1,10 +1,10 @@
 package org.dooq;
 
-import org.dooq.core.exception.DynamoOperationException;
-import org.dooq.api.AbstractRecord;
+import org.dooq.api.DynamoRecord;
 import org.dooq.api.Table;
 import org.dooq.core.Condition;
 import org.dooq.core.DynamoOperation;
+import org.dooq.core.exception.DynamoOperationException;
 import org.dooq.engine.ExpressionCompiler;
 import org.dooq.engine.ExpressionRenderer;
 import org.jetbrains.annotations.Contract;
@@ -20,7 +20,7 @@ import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class DeleteOperation<R extends AbstractRecord<R>, K extends Key> extends DynamoOperation<R, K> {
+public class DeleteOperation<R extends DynamoRecord<R>, K extends Key> extends DynamoOperation<R, K> {
 
     private DeleteItemRequest.Builder builder;
     private ExpressionRenderer<R, K> expression;
@@ -44,7 +44,7 @@ public class DeleteOperation<R extends AbstractRecord<R>, K extends Key> extends
     }
 
     @Contract("_ -> new")
-    public static <R extends AbstractRecord<R>, K extends Key> @NotNull DeleteOperation<R, K> from(Table<R, K> table) {
+    public static <R extends DynamoRecord<R>, K extends Key> @NotNull DeleteOperation<R, K> from(Table<R, K> table) {
         return new DeleteOperation<>(table);
     }
 

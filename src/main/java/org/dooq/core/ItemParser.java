@@ -1,9 +1,8 @@
 package org.dooq.core;
 
-import org.dooq.api.AbstractRecord;
 import org.dooq.api.Column;
 import org.dooq.api.DynamoConverter;
-import org.dooq.parser.ParserCompiler;
+import org.dooq.api.DynamoRecord;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -19,12 +18,12 @@ import java.util.stream.Collectors;
 public class ItemParser {
 
     @Contract("_ -> new")
-    public static <T extends AbstractRecord<T>> @NotNull ParseResult writeRecord(@NotNull T object) {
+    public static <T extends DynamoRecord<T>> @NotNull ParseResult writeRecord(@NotNull T object) {
         return write(object);
     }
 
     @Contract("_ -> new")
-    public static @NotNull ParseResult write(@NotNull AbstractRecord<?> object) {
+    public static @NotNull ParseResult write(@NotNull DynamoRecord<?> object) {
         var fields = object.getClass().getDeclaredFields();
 
         if (fields.length == 0) {

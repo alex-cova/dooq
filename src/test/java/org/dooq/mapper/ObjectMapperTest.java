@@ -1,6 +1,8 @@
-package org.dooq;
+package org.dooq.mapper;
 
 import org.dooq.core.ItemParser;
+import org.dooq.scheme.ProductRecord;
+import org.dooq.scheme.Tables;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -9,10 +11,10 @@ import java.math.BigDecimal;
 public class ObjectMapperTest {
 
     @Test
-    void checkConvertion() {
+    void testMapping() {
 
         var object = new ProductRecord()
-                .setContentId(1L)
+                .setCompanyId(1L)
                 .setUuid("uuid")
                 .setDescription("Description")
                 .setDetails("details")

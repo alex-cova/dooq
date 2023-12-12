@@ -1,8 +1,8 @@
 package org.dooq.core.schema;
 
 import org.dooq.Key;
-import org.dooq.api.AbstractRecord;
 import org.dooq.api.Column;
+import org.dooq.api.DynamoRecord;
 import org.dooq.api.Table;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 
 @SuppressWarnings("unused")
-public class TableBuilder<R extends AbstractRecord<R>, K extends Key> {
+public class TableBuilder<R extends DynamoRecord<R>, K extends Key> {
 
     private final Table<R, K> table;
     private final CreateTableRequest.Builder builder;
@@ -134,7 +134,7 @@ public class TableBuilder<R extends AbstractRecord<R>, K extends Key> {
         return this;
     }
 
-    public static <R extends AbstractRecord<R>, K extends Key> TableBuilder<R, K> of(Table<R, K> table) {
+    public static <R extends DynamoRecord<R>, K extends Key> TableBuilder<R, K> of(Table<R, K> table) {
         return new TableBuilder<>(table);
     }
 

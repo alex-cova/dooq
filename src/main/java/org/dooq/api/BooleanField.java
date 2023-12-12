@@ -3,7 +3,7 @@ package org.dooq.api;
 import org.dooq.Key;
 import org.dooq.expressions.BooleanComparison;
 
-public class BooleanField<T, R extends AbstractRecord<R>, K extends Key> extends Field<T, R, K> {
+public class BooleanField<T, R extends DynamoRecord<R>, K extends Key> extends Field<T, R, K> {
     public BooleanField(String name, Class<T> type, Table<R, K> table) {
         super(type, name, ColumnType.NORMAL, false, table);
     }

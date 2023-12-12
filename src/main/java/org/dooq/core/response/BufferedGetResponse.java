@@ -1,7 +1,7 @@
 package org.dooq.core.response;
 
 import org.dooq.Key;
-import org.dooq.api.AbstractRecord;
+import org.dooq.api.DynamoRecord;
 import org.dooq.api.Table;
 import org.dooq.core.SingleResponse;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
@@ -9,7 +9,7 @@ import software.amazon.awssdk.services.dynamodb.model.GetItemResponse;
 
 import java.util.Map;
 
-public class BufferedGetResponse<R extends AbstractRecord<R>, K extends Key> implements SingleResponse<R, K> {
+public class BufferedGetResponse<R extends DynamoRecord<R>, K extends Key> implements SingleResponse<R, K> {
 
     private final GetItemResponse response;
     private final Table<R, K> table;

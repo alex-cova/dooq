@@ -1,6 +1,6 @@
 package org.dooq.core.response;
 
-import org.dooq.api.AbstractRecord;
+import org.dooq.api.DynamoRecord;
 import org.dooq.api.Table;
 import org.dooq.parser.ParserCompiler;
 import org.jetbrains.annotations.NotNull;
@@ -15,7 +15,7 @@ public record BatchGetMultiTableResponse(BatchGetItemResponse response) {
         return !response.hasResponses();
     }
 
-    public @NotNull <R extends AbstractRecord<R>> List<R> getItems(@NotNull Table<R, ?> table) {
+    public @NotNull <R extends DynamoRecord<R>> List<R> getItems(@NotNull Table<R, ?> table) {
         var items = response.responses()
                 .get(table.getTableName());
 

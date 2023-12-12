@@ -1,5 +1,7 @@
 package org.dooq;
 
+import org.dooq.parser.ParserCompiler;
+import org.dooq.scheme.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
@@ -8,8 +10,8 @@ import software.amazon.awssdk.services.dynamodb.model.QueryRequest;
 import java.util.List;
 import java.util.Map;
 
-import static org.dooq.Tables.MIXER;
-import static org.dooq.Tables.PRODUCT;
+import static org.dooq.scheme.Tables.MIXER;
+import static org.dooq.scheme.Tables.PRODUCT;
 
 public class DynamoSLTest {
 
@@ -32,7 +34,7 @@ public class DynamoSLTest {
     void checkQueryGetItemConvert() {
 
         dsl.selectFrom(PRODUCT)
-                .where(PRODUCT.CONTENTID.eq(1L)
+                .where(PRODUCT.COMPANYID.eq(1L)
                         .and(PRODUCT.UUID.eq("abcdef")))
                 .fetchOne();
 
@@ -48,9 +50,9 @@ public class DynamoSLTest {
         dsl.delete(ProductKey.of(1, "123"), ProductKey.of(1, "124"), MixerKey.of("1", "125"));
 
         dsl.delete(dsl.deleteFrom(PRODUCT)
-                        .where(PRODUCT.CONTENTID.eq(1L)),
+                        .where(PRODUCT.COMPANYID.eq(1L)),
                 dsl.deleteFrom(MIXER)
-                        .where(MIXER.CONTENTID.eq("1")));
+                        .where(MIXER.COMPANYID.eq("1")));
 
         dsl.deleteFrom(PRODUCT)
                 .key(key -> key.partition(1).sort("123"));
@@ -98,7 +100,7 @@ public class DynamoSLTest {
     @Test
     void queryWithFilters() {
         dsl.selectFrom(PRODUCT)
-                .where(PRODUCT.CONTENTID.eq(1L)
+                .where(PRODUCT.COMPANYID.eq(1L)
                         .and(PRODUCT.UUID.eq("abcdef"))
                         .and(PRODUCT.CATEGORYID.eq("category")))
                 .fetchOne();
@@ -108,7 +110,7 @@ public class DynamoSLTest {
         final QueryRequest request = client.getLastRequest();
 
         dsl.selectFrom(PRODUCT)
-                .where(PRODUCT.CONTENTID.eq(1L)
+                .where(PRODUCT.COMPANYID.eq(1L)
                         .and(PRODUCT.UUID.eq("abcdef")
                                 .and(PRODUCT.CATEGORYID.eq("category"))))
                 .fetchOne();
@@ -122,7 +124,7 @@ public class DynamoSLTest {
     @Test
     void testComplexQuery() {
         dsl.selectFrom(PRODUCT)
-                .where(PRODUCT.CONTENTID.eq(1L)
+                .where(PRODUCT.COMPANYID.eq(1L)
                         .and(PRODUCT.UUID.eq("uuid"))
                         .and(PRODUCT.PURCHASEUNITID.in(List.of("salesUnit")))
                         .and(PRODUCT.CATEGORYID.eq("category")
@@ -136,7 +138,7 @@ public class DynamoSLTest {
         System.out.println("---");
 
         dsl.selectFrom(PRODUCT)
-                .where(PRODUCT.CONTENTID.eq(1L)
+                .where(PRODUCT.COMPANYID.eq(1L)
                         .and(PRODUCT.UUID.eq("uuid"))
                         .and(PRODUCT.PURCHASEUNITID.in(List.of("salesUnit")))
                         .and(PRODUCT.CATEGORYID.eq("category"))
@@ -147,21 +149,10 @@ public class DynamoSLTest {
         Assertions.assertFalse(client.getQueryRequest().filterExpression().contains(")"));
     }
 
-    void testFrog() {
-
-        List<MixerRecord> frog = dsl.selectFrom(MIXER)
-                .where(MIXER.CONTENTID.eq("1")
-                        .and(MIXER.UUID.eq("frog")))
-                .consistentRead()
-                .fetch();
-
-
-    }
-
     @Test
     void testComplex2() {
         dsl.selectFrom(PRODUCT)
-                .where(PRODUCT.CONTENTID.eq(1L)
+                .where(PRODUCT.COMPANYID.eq(1L)
                         .and(PRODUCT.UUID.eq("uuid"))
                         .and(PRODUCT.PURCHASEUNITID.in(List.of("salesUnit", "purchaseUnit")))
                         .and(PRODUCT.CATEGORYID.eq("category")
@@ -176,7 +167,7 @@ public class DynamoSLTest {
     @Test
     void checkDelete() {
         dsl.deleteFrom(PRODUCT)
-                .where(PRODUCT.CONTENTID.eq(1L)
+                .where(PRODUCT.COMPANYID.eq(1L)
                         .and(PRODUCT.UUID.eq("uuid")))
                 .execute();
     }
@@ -191,7 +182,7 @@ public class DynamoSLTest {
     void expressionAttributeValues() {
         dsl.select(PRODUCT.DESCRIPTION)
                 .from(PRODUCT)
-                .where(PRODUCT.CONTENTID.eq(1L))
+                .where(PRODUCT.COMPANYID.eq(1L))
                 .fetchInto(String.class);
 
         Map<String, AttributeValue> map = client.getQueryRequest()
@@ -212,7 +203,7 @@ public class DynamoSLTest {
     void missingExpressionName() {
         dsl.fetchExists(dsl.selectFrom(PRODUCT)
                 .onIndex(PRODUCT.DEPARTMENTID)
-                .where(PRODUCT.CONTENTID.eq(1L)
+                .where(PRODUCT.COMPANYID.eq(1L)
                         .and(PRODUCT.DEPARTMENTID.eq("uuid"))));
 
         Assertions.assertFalse(client.getQueryRequest().expressionAttributeNames().isEmpty());
@@ -223,14 +214,14 @@ public class DynamoSLTest {
         dsl.selectFrom(PRODUCT)
                 .onIndex(PRODUCT.CATEGORYID)
                 .where(PRODUCT.CATEGORYID.eq("uuid")
-                        .and(PRODUCT.CONTENTID.eq(1L)))
+                        .and(PRODUCT.COMPANYID.eq(1L)))
                 .fetchInto(ProductRecord.class);
     }
 
     @Test
     void getFromTransform() {
         dsl.selectFrom(PRODUCT)
-                .where(PRODUCT.UUID.eq("uuid").and(PRODUCT.CONTENTID.eq(1L)))
+                .where(PRODUCT.UUID.eq("uuid").and(PRODUCT.COMPANYID.eq(1L)))
                 .execute();
 
         client.assertLastGetItemRequest();
@@ -238,8 +229,8 @@ public class DynamoSLTest {
 
     void testQueryFrom() {
         dsl.selectFrom(PRODUCT)
-                .onLocalIndex(PRODUCT.CONTENTID)
-                .where(PRODUCT.CONTENTID.eq(1L))
+                .onLocalIndex(PRODUCT.COMPANYID)
+                .where(PRODUCT.COMPANYID.eq(1L))
                 .startingFrom(ProductKey.of(1, "123"))
                 .startingFrom(key -> key.partition(1).sort("absc"))
                 .execute();
@@ -247,16 +238,19 @@ public class DynamoSLTest {
 
     @Test
     void testBeginsKey() {
+
         dsl.selectFrom(PRODUCT)
-                .where(PRODUCT.CONTENTID.eq(1L)
+                .where(PRODUCT.COMPANYID.eq(1L)
                         .and(PRODUCT.UUID.startsWith("SEL")))
                 .execute();
+
     }
 
     @Test
     void fetchExists() {
+
         dsl.fetchExists(dsl.selectFrom(PRODUCT)
-                .where(Tables.PRODUCT.CONTENTID.eq(1L)
+                .where(Tables.PRODUCT.COMPANYID.eq(1L)
                         .and(PRODUCT.SKU.eq("sku"))));
 
     }
@@ -265,7 +259,7 @@ public class DynamoSLTest {
     void testWhile() {
 
         List<ProductRecord> productRecords = dsl.selectFrom(PRODUCT)
-                .until(PRODUCT.CONTENTID.eq(1L))
+                .until(PRODUCT.COMPANYID.eq(1L))
                 .startingFrom(key -> key.partition("1")
                         .sort(1234))
                 .limit(100)
@@ -294,5 +288,31 @@ public class DynamoSLTest {
                         .and(MIXER.TAGNAME.eq("tagName"))));
 
         Assertions.assertTrue(client.getQueryRequest().keyConditionExpression().contains("AND"));
+    }
+
+    @Test
+    void convertUsingSpecifiedConverter() {
+
+        var parser = ParserCompiler.getConverter(MixerRecord.class);
+
+        dsl.selectFrom(PRODUCT)
+                .where(PRODUCT.COMPANYID.eq(1L)
+                        .and(PRODUCT.UUID.eq("uuid")))
+                .execute();
+
+        dsl.selectFrom(PRODUCT)
+                .where(PRODUCT.COMPANYID.eq(1L)
+                        .and(PRODUCT.UUID.eq("uuid")))
+                .fetch(parser);
+
+        dsl.selectFrom(PRODUCT)
+                .where(PRODUCT.COMPANYID.eq(1L)
+                        .and(PRODUCT.UUID.eq("uuid")))
+                .fetchOne(parser);
+
+        dsl.selectFrom(PRODUCT)
+                .withKey(ProductKey.of(1, "1"))
+                .fetch(parser);
+
     }
 }

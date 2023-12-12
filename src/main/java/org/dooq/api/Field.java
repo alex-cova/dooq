@@ -13,7 +13,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-public class Field<T, R extends AbstractRecord<R>, K extends Key> implements Column<R, K>, FieldType<T> {
+public class Field<T, R extends DynamoRecord<R>, K extends Key> implements Column<R, K>, FieldType<T> {
 
     private final Class<T> type;
     private final String name;

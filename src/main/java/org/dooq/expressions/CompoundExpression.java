@@ -1,8 +1,8 @@
 package org.dooq.expressions;
 
 import org.dooq.Key;
-import org.dooq.api.AbstractRecord;
 import org.dooq.api.Column;
+import org.dooq.api.DynamoRecord;
 import org.dooq.api.Table;
 import org.dooq.engine.ExpressionRenderer;
 import org.dooq.engine.RendererContext;
@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public final class CompoundExpression<R extends AbstractRecord<R>, K extends Key> implements ExpressionRenderer<R, K> {
+public final class CompoundExpression<R extends DynamoRecord<R>, K extends Key> implements ExpressionRenderer<R, K> {
 
     private final List<InternalExpression<R, K>> expressions;
 

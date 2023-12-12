@@ -1,9 +1,9 @@
 package org.dooq.expressions;
 
-import org.dooq.engine.RendererContext;
 import org.dooq.Key;
-import org.dooq.api.AbstractRecord;
 import org.dooq.api.Column;
+import org.dooq.api.DynamoRecord;
+import org.dooq.engine.RendererContext;
 import org.dooq.engine.SingleExpressionRenderer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
@@ -18,7 +18,7 @@ import java.util.Map;
  * <p>
  * attribute_not_exists (Manufacturer)
  */
-public class AttributeNotExistsExpression<R extends AbstractRecord<R>, K extends Key> extends SingleExpressionRenderer<R, K> {
+public class AttributeNotExistsExpression<R extends DynamoRecord<R>, K extends Key> extends SingleExpressionRenderer<R, K> {
 
     public AttributeNotExistsExpression(Column<R, K> column) {
         super(column);

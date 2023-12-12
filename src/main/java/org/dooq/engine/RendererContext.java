@@ -1,8 +1,8 @@
 package org.dooq.engine;
 
 import org.dooq.Key;
-import org.dooq.api.AbstractRecord;
 import org.dooq.api.Column;
+import org.dooq.api.DynamoRecord;
 import org.dooq.api.Table;
 import org.dooq.expressions.CompoundExpression;
 import org.dooq.expressions.Operator;
@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RendererContext<R extends AbstractRecord<R>, K extends Key> {
+public class RendererContext<R extends DynamoRecord<R>, K extends Key> {
 
     private final Table<R, K> table;
     private final @Nullable Column<R, K> index;

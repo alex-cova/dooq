@@ -1,13 +1,13 @@
 package org.dooq;
 
-import org.dooq.api.AbstractRecord;
 import org.dooq.api.Column;
+import org.dooq.api.DynamoRecord;
 import org.dooq.api.Table;
-import org.dooq.core.exception.DynamoOperationException;
 import org.dooq.core.AttributeWriter;
 import org.dooq.core.Condition;
 import org.dooq.core.DynamoOperation;
 import org.dooq.core.ItemParser;
+import org.dooq.core.exception.DynamoOperationException;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class PutOperation<R extends AbstractRecord<R>, K extends Key> extends DynamoOperation<R, K> {
+public class PutOperation<R extends DynamoRecord<R>, K extends Key> extends DynamoOperation<R, K> {
 
     private final HashMap<String, AttributeValue> data;
     private PutItemRequest.Builder builder;
@@ -37,7 +37,7 @@ public class PutOperation<R extends AbstractRecord<R>, K extends Key> extends Dy
     }
 
     @Contract("_ -> new")
-    public static <R extends AbstractRecord<R>, K extends Key> @NotNull PutOperation<R, K> into(Table<R, K> table) {
+    public static <R extends DynamoRecord<R>, K extends Key> @NotNull PutOperation<R, K> into(Table<R, K> table) {
         return new PutOperation<>(table);
     }
 

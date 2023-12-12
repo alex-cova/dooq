@@ -1,9 +1,9 @@
 package org.dooq;
 
-import org.dooq.api.AbstractRecord;
+import org.dooq.api.DynamoRecord;
 import org.dooq.api.Table;
-import org.dooq.core.response.BufferedBatchWriteItemRequest;
 import org.dooq.core.DynamoOperation;
+import org.dooq.core.response.BufferedBatchWriteItemRequest;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.BatchWriteItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.DeleteRequest;
@@ -16,7 +16,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-public class BatchDeleteOperation<R extends AbstractRecord<R>, K extends Key> extends DynamoOperation<R, K> {
+public class BatchDeleteOperation<R extends DynamoRecord<R>, K extends Key> extends DynamoOperation<R, K> {
 
     private final BatchWriteItemRequest.Builder builder;
     private final List<K> keys;

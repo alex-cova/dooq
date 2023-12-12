@@ -1,12 +1,12 @@
 package org.dooq.util;
 
-import org.dooq.api.AbstractRecord;
-import org.dooq.api.Column;
-import org.dooq.expressions.CompoundExpression;
-import org.dooq.expressions.ConditionExpression;
 import org.dooq.Key;
+import org.dooq.api.Column;
+import org.dooq.api.DynamoRecord;
 import org.dooq.api.Table;
 import org.dooq.engine.ExpressionRenderer;
+import org.dooq.expressions.CompoundExpression;
+import org.dooq.expressions.ConditionExpression;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-public final class ExpressionResult<R extends AbstractRecord<R>, K extends Key> {
+public final class ExpressionResult<R extends DynamoRecord<R>, K extends Key> {
 
     private final Table<R, K> table;
     private String keyCondition;

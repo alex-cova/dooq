@@ -1,13 +1,13 @@
 package org.dooq.engine;
 
-import org.dooq.expressions.CompoundExpression;
-import org.dooq.util.ScanExpressionResult;
 import org.dooq.Key;
-import org.dooq.api.AbstractRecord;
 import org.dooq.api.Column;
+import org.dooq.api.DynamoRecord;
 import org.dooq.api.Table;
+import org.dooq.expressions.CompoundExpression;
 import org.dooq.util.AbstractKey;
 import org.dooq.util.ExpressionResult;
+import org.dooq.util.ScanExpressionResult;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 
 public class ExpressionCompiler {
 
-    public static <R extends AbstractRecord<R>, K extends Key> @NotNull ScanExpressionResult<R, K>
+    public static <R extends DynamoRecord<R>, K extends Key> @NotNull ScanExpressionResult<R, K>
     compileForScan(@NotNull Table<R, K> table, @NotNull List<ExpressionRenderer<R, K>> list, Column<R, K> index) {
         var compiled = compile(table, list, index);
 
@@ -42,7 +42,7 @@ public class ExpressionCompiler {
      * For KeyConditions, only the following comparison operators are supported:
      * EQ | LE | LT | GE | GT | BEGINS_WITH | BETWEEN
      */
-    public static <R extends AbstractRecord<R>, K extends Key> @NotNull ExpressionResult<R, K>
+    public static <R extends DynamoRecord<R>, K extends Key> @NotNull ExpressionResult<R, K>
     compile(Table<R, K> table, @NotNull List<ExpressionRenderer<R, K>> expressionList, @Nullable Column<R, K> index) {
 
         final var columns = expressionList
@@ -72,7 +72,7 @@ public class ExpressionCompiler {
 
     }
 
-    public static <R extends AbstractRecord<R>, K extends Key> Key buildKey(Table<R, K> table, ExpressionRenderer<R, K> expression) {
+    public static <R extends DynamoRecord<R>, K extends Key> Key buildKey(Table<R, K> table, ExpressionRenderer<R, K> expression) {
 
         if (expression instanceof CompoundExpression<R, K> compound) {
 
@@ -92,7 +92,7 @@ public class ExpressionCompiler {
                 .setPartitionKeyName(map);
     }
 
-    public static <R extends AbstractRecord<R>, K extends Key>
+    public static <R extends DynamoRecord<R>, K extends Key>
     @NotNull Map<String, Object> map(@NotNull List<ExpressionRenderer<R, K>> expressionList) {
         Map<String, Object> resultMap = new HashMap<>();
 

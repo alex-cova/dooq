@@ -1,9 +1,9 @@
 package org.dooq.expressions;
 
-import org.dooq.engine.RendererContext;
 import org.dooq.Key;
-import org.dooq.api.AbstractRecord;
 import org.dooq.api.Column;
+import org.dooq.api.DynamoRecord;
+import org.dooq.engine.RendererContext;
 import org.dooq.engine.SingleExpressionRenderer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
@@ -19,7 +19,7 @@ import java.util.Map;
  *
  * @param <T>
  */
-public class InExpression<T, R extends AbstractRecord<R>, K extends Key> extends SingleExpressionRenderer<R, K> {
+public class InExpression<T, R extends DynamoRecord<R>, K extends Key> extends SingleExpressionRenderer<R, K> {
 
     private final List<T> values;
 

@@ -1,12 +1,12 @@
 package org.dooq.engine;
 
-import org.dooq.api.AbstractRecord;
-import org.dooq.api.Column;
 import org.dooq.Key;
+import org.dooq.api.Column;
+import org.dooq.api.DynamoRecord;
 
 import java.util.List;
 
-public abstract class SingleExpressionRenderer<R extends AbstractRecord<R>, K extends Key> extends AbstractExpressionRenderer<R, K> {
+public abstract class SingleExpressionRenderer<R extends DynamoRecord<R>, K extends Key> extends AbstractExpressionRenderer<R, K> {
 
     private final Column<R, K> column;
 

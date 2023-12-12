@@ -1,11 +1,11 @@
 package org.dooq;
 
-import org.dooq.api.AbstractRecord;
 import org.dooq.api.Column;
+import org.dooq.api.DynamoRecord;
+import org.dooq.api.Table;
 import org.dooq.core.DynamoOperation;
 import org.dooq.core.LastEvaluatedKey;
 import org.dooq.core.ListResponse;
-import org.dooq.api.Table;
 import org.dooq.engine.ExpressionRenderer;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
@@ -17,7 +17,7 @@ import java.util.*;
  *
  * @author alex
  */
-public class TableIterator<R extends AbstractRecord<R>, K extends Key> extends DynamoOperation<R, K> implements Iterable<R>, Iterator<R> {
+public class TableIterator<R extends DynamoRecord<R>, K extends Key> extends DynamoOperation<R, K> implements Iterable<R>, Iterator<R> {
 
     private final QueryOperation<R, K> queryOperation;
     private List<R> result = Collections.emptyList();

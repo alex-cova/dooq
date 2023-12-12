@@ -1,10 +1,10 @@
 package org.dooq.engine;
 
 import org.dooq.Key;
-import org.dooq.api.AbstractRecord;
 import org.dooq.api.BooleanField;
 import org.dooq.api.Column;
 import org.dooq.api.ColumnType;
+import org.dooq.api.DynamoRecord;
 import org.dooq.expressions.CompoundExpression;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
  * | contains (path, operand)
  * | size (path)
  */
-public interface ExpressionRenderer<R extends AbstractRecord<R>, K extends Key> {
+public interface ExpressionRenderer<R extends DynamoRecord<R>, K extends Key> {
 
     List<Column<R, K>> columns();
 

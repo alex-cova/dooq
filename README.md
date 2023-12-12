@@ -10,6 +10,7 @@ DynamoDB Object-Oriented Query
 - Declarative syntax
 - Zero-cost item to class parsing
 - Automatic Schema generation
+- Lazy operations
 
 ```
 implementation("org.dooq:dooq:1.0.0-SNAPSHOT")
@@ -19,15 +20,16 @@ annotationProcessor("org.dooq:dooq-processor:1.0.0-SNAPSHOT")
 # DynamoDSL
 
 A domain specific language for DynamoDB, it uses a table specification which is auto-generated
-by the annotation processor and is used to made read optimizations and validations
-at runtime, however it can be used without the schema definition.
+by the annotation processor and is used for read operations and validations
+at runtime, **however this DSL doesn't force you to work in a scheme-strict way it can 
+be used without the schema definition or have multiple record types in the same table.**
 
 Inspired on JOOQ, running on top of
 the [DynamoDB low level API](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Programming.LowLevelAPI.html)
 
 # The mapper
 
-Generates converter classes (Java 17) for POJOs/Recods at runtime, using ASM.
+Generates converter classes (Java 17) for POJOs/Records at runtime, using ASM.
 
 ## Features
 
@@ -51,7 +53,7 @@ ConverterBenchmark.writeBenchmark  avgt    5  1071.437 ± 4.250  ns/op
 * Target class must have a default constructor
 * Target class must have getters and setters for all fields to parse
 
-if you want to omit some fields, you can use `@DynamoIgnore` annotation or `transient` keyword on field,
+if you want to ignore some fields, you can use `@DynamoIgnore` annotation or `transient` keyword on field,
 **this doesn't apply to records.**
 
 # Key Differences
@@ -92,8 +94,9 @@ public class CatalogItem {
 
 @DynamoDBTable("ProductCatalog")
 public class CatalogItem {
-    @PartitionKey
+    @PartitionKey(alias = "Id")
     private Integer id;
+    @ColumnAlias("Title")
     private String title;
     private String ISBN;
     private Set<String> bookAuthors;
@@ -113,15 +116,17 @@ item or the **record** class.
 **DynamoDB-Mapper**
 
 ```java
-        CatalogItem item=new CatalogItem();
-        item.setId(601);
-        item.setTitle("Book 601");
-        item.setISBN("611-1111111111");
-        item.setBookAuthors(Set.of("Author1","Author2"));
+public void store() {
+    CatalogItem item = new CatalogItem();
+    item.setId(601);
+    item.setTitle("Book 601");
+    item.setISBN("611-1111111111");
+    item.setBookAuthors(Set.of("Author1", "Author2"));
 
-// Save the item (book).
-        DynamoDBMapper mapper=new DynamoDBMapper(client);
-        mapper.save(item);
+    // Save the item (book).
+    DynamoDBMapper mapper = new DynamoDBMapper(client);
+    mapper.save(item);
+}
 
 ```
 
@@ -131,21 +136,25 @@ item or the **record** class.
 
 ```java
 
-dsl.newRecord(Tables.PRODUCTCATALOG)
-	.setId(601)
-        .setTitle("Book 601")
-        .setISBN("611-1111111111")
-        .setBookAuthors(Set.of("Author1","Author2"))
-        .store();
+public void store() {
+    dsl.newRecord(Tables.PRODUCTCATALOG)
+            .setId(601)
+            .setTitle("Book 601")
+            .setISBN("611-1111111111")
+            .setBookAuthors(Set.of("Author1", "Author2"))
+            .store();
+}
 ```
 
 or
 
 ```java
-dsl.insertInto(CATALOGINTEM)
-        .value(somePojo)
-        .key(SomeKey)
-        .execute();
+public void store() {
+    dsl.insertInto(CATALOGINTEM)
+            .value(somePojo)
+            .key(SomeKey)
+            .execute();
+}
 ```
 
 ## Retrieve
@@ -153,7 +162,7 @@ dsl.insertInto(CATALOGINTEM)
 **AWS**
 
 ```java
-CatalogItem itemRetrieved = mapper.load(CatalogItem.class,601);
+CatalogItem itemRetrieved = mapper.load(CatalogItem.class, 601);
 ```
 
 **DynamoDSL**
@@ -177,7 +186,7 @@ CatalogItem itemRetrieved = dsl.selectFrom(CATALOGITEM)
 and maybe I only want the title...
 
 ```java
-String title=dsl.select(CatalogItem.TITLE)
+String title = dsl.select(CatalogItem.TITLE)
         .from(CATALOGITEM)
         .withKey(CatalogItemKey.of(601))
         .fetch();
@@ -186,7 +195,7 @@ String title=dsl.select(CatalogItem.TITLE)
 > This operation automatically defines a projection expression to only retrieve the title attribute
 
 ```java
-CatalogItem itemRetrieved=dsl.selectFrom(CATALOGITEM)
+CatalogItem itemRetrieved = dsl.selectFrom(CATALOGITEM)
         .where(CatalogItem.ID.eq(601))
         .fetchOne();
 ```
@@ -196,11 +205,11 @@ CatalogItem itemRetrieved=dsl.selectFrom(CATALOGITEM)
 Want to use the title index?! no problem...
 
 ```java
-CatalogItem itemRetrieved=dsl.selectFrom(CATALOGITEM)
+CatalogItem itemRetrieved = dsl.selectFrom(CATALOGITEM)
         .index(CatalogItem.TITLE)
         .where(CatalogItem.ID.eq(601)
-        .and(CatalogItem.TITLE.eq("theTitle"))
-        .fetchOne();
+                .and(CatalogItem.TITLE.eq("theTitle"))
+                .fetchOne();
 ```
 
 ### Consistent Retrieve
@@ -208,16 +217,16 @@ CatalogItem itemRetrieved=dsl.selectFrom(CATALOGITEM)
 **AWS**
 
 ```java
-DynamoDBMapperConfig config=DynamoDBMapperConfig.builder()
+DynamoDBMapperConfig config = DynamoDBMapperConfig.builder()
         .withConsistentReads(DynamoDBMapperConfig.ConsistentReads.CONSISTENT)
         .build();
-        CatalogItem updatedItem=mapper.load(CatalogItem.class,601,config);
+CatalogItem updatedItem = mapper.load(CatalogItem.class, 601, config);
 ```
 
 **DynamoDSL**
 
 ```java
-CatalogItem itemRetrieved=dsl.selectFrom(CATALOGITEM)
+CatalogItem itemRetrieved = dsl.selectFrom(CATALOGITEM)
         .where(CatalogItem.ID.eq(601))
         .consistent()
         .fetchOne();
@@ -234,7 +243,7 @@ mapper.deleteOperation(new CatalogItem(601));
 **DynamoDSL**
 
 ```java
-boolean deleted=dsl.deleteFrom(CATALOGITEM)
+boolean deleted = dsl.deleteFrom(CATALOGITEM)
         .withKey(CatalogItemKey.of(601))
         .execute();
 ```
@@ -242,7 +251,7 @@ boolean deleted=dsl.deleteFrom(CATALOGITEM)
 or
 
 ```java
-boolean deleted=dsl.deleteFrom(CATALOGITEM)
+boolean deleted = dsl.deleteFrom(CATALOGITEM)
         .where(CatalogItem.ID.eq(601))
         .execute();
 ```
@@ -263,9 +272,15 @@ or batched
 
 ```java
 dsl.delete(dsl.deleteFrom(CATALOGITEM)
-        .where(CATALOGITEM.ID.eq("1")),
-        dsl.deleteFrom(ANOTHERITEM)
-        .where(ANOTHERITEM.ID.eq(123)));
+        .
+
+where(CATALOGITEM.ID.eq("1")),
+        dsl.
+
+deleteFrom(ANOTHERITEM)
+        .
+
+where(ANOTHERITEM.ID.eq(123)));
 ```
 
 ## Update
@@ -368,29 +383,29 @@ List<Reply> latestReplies=dsl.selectFrom(REPLY)
 or
 
 ```java
-List<ReplyDto> latestReplies=dsl.selectFrom(Reply)
-        .where(REPLY.ID.eq(forumName,threadSubject)
-        .and(REPLY.REPLYDATETIME.greaterThan(twoWeeksAgoStr)))
+List<ReplyDto> latestReplies = dsl.selectFrom(Reply)
+        .where(REPLY.ID.eq(forumName, threadSubject)
+                .and(REPLY.REPLYDATETIME.greaterThan(twoWeeksAgoStr)))
         .fetchInto(ReplyDto.class);
 ```
 
 ```java
-List<ReplyDto> latestReplies=dsl.selectFrom(REPLY)
-        .where(REPLY.ID.eq(forumName,threadSubject)
-        .and(REPLY.REPLYDATETIME.greaterThan(twoWeeksAgoStr)))
+List<ReplyDto> latestReplies = dsl.selectFrom(REPLY)
+        .where(REPLY.ID.eq(forumName, threadSubject)
+                .and(REPLY.REPLYDATETIME.greaterThan(twoWeeksAgoStr)))
         .mapping(this::toDto);
 ```
 
 We don't have to explicit specify the Partition-Sort Key
 
 ```java
-        List<Reply> latestReplies=dsl.selectFrom(REPLY)
-        .where(REPLY.ID.eq(forumName,threadSubject)
-        .and(REPLY.REPLYDATETIME.greaterThan(twoWeeksAgoStr)
-        .and(REPLY.USERID.in(Set.of("123"))
-        .or(REPLY.STATUS.eq(123)))
-        .and(REPLY.SEEN.isTrue())
-        ))
+        List<Reply> latestReplies = dsl.selectFrom(REPLY)
+        .where(REPLY.ID.eq(forumName, threadSubject)
+                .and(REPLY.REPLYDATETIME.greaterThan(twoWeeksAgoStr)
+                        .and(REPLY.USERID.in(Set.of("123"))
+                                .or(REPLY.STATUS.eq(123)))
+                        .and(REPLY.SEEN.isTrue())
+                ))
         .fetch();
 ```
 
@@ -408,19 +423,19 @@ Scan and queryOperation are almost the same.
         eav.putOperation(":val1",new AttributeValue().withN(value));
         eav.putOperation(":val2",new AttributeValue().withS("Book"));
 
-        DynamoDBScanExpression scanExpression=new DynamoDBScanExpression()
+DynamoDBScanExpression scanExpression = new DynamoDBScanExpression()
         .withFilterExpression("Price < :val1 and ProductCategory = :val2").withExpressionAttributeValues(eav);
 
-        List<Book> scanResult=mapper.scanOperation(Book.class,scanExpression);
+List<Book> scanResult = mapper.scanOperation(Book.class, scanExpression);
 ```
 
 **DynamoDSL**
 
 ```java
-List<Book> scanResult=dsl.scanOperation(PRODUCTS)
+List<Book> scanResult = dsl.scanOperation(PRODUCTS)
         .where(PRODUCT.PRICE.lessThan(value)
-        .and(PRODUCT.PRODUCTCATEGORY.eq("Book"))
-        .fetch();
+                .and(PRODUCT.PRODUCTCATEGORY.eq("Book"))
+                .fetch();
 ```
 
 ## Features
@@ -429,9 +444,9 @@ List<Book> scanResult=dsl.scanOperation(PRODUCTS)
 
 ```java
 
-boolean exists=dsl.fetchExists(dsl.selectFrom(PRODUCT)
+boolean exists = dsl.fetchExists(dsl.selectFrom(PRODUCT)
         .where(PRODUCT.STOREID.eq(1)
-        .and(PRODUCT.SKU.eq("sku"))
+                .and(PRODUCT.SKU.eq("sku"))
 
 ```
 

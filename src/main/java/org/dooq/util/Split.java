@@ -1,13 +1,13 @@
 package org.dooq.util;
 
-import org.dooq.api.AbstractRecord;
 import org.dooq.Key;
+import org.dooq.api.DynamoRecord;
 import org.dooq.engine.ExpressionRenderer;
 
 import java.util.List;
 import java.util.Objects;
 
-public final class Split<R extends AbstractRecord<R>, K extends Key> {
+public final class Split<R extends DynamoRecord<R>, K extends Key> {
     private final List<ExpressionRenderer<R, K>> keys;
     private final List<ExpressionRenderer<R, K>> nonKeys;
 

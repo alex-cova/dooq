@@ -1,10 +1,10 @@
 package org.dooq.expressions;
 
-import org.dooq.api.AbstractRecord;
+import org.dooq.Key;
 import org.dooq.api.Column;
+import org.dooq.api.DynamoRecord;
 import org.dooq.engine.ExpressionRenderer;
 import org.dooq.engine.RendererContext;
-import org.dooq.Key;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
@@ -12,7 +12,7 @@ import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import java.util.List;
 import java.util.Map;
 
-class InternalExpression<R extends AbstractRecord<R>, K extends Key> {
+class InternalExpression<R extends DynamoRecord<R>, K extends Key> {
 
     private Operator operator;
     private final ExpressionRenderer<R, K> expression;

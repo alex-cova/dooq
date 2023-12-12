@@ -1,9 +1,9 @@
 package org.dooq.expressions;
 
-import org.dooq.api.AbstractRecord;
-import org.dooq.api.Column;
-import org.dooq.engine.RendererContext;
 import org.dooq.Key;
+import org.dooq.api.Column;
+import org.dooq.api.DynamoRecord;
+import org.dooq.engine.RendererContext;
 import org.dooq.engine.SingleExpressionRenderer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
@@ -18,7 +18,7 @@ import java.util.Map;
  * begins_with (Pictures.FrontView, :v_sub)
  * The expression attribute value :v_sub is a placeholder for http://.
  */
-public class BeginsWithExpression<R extends AbstractRecord<R>, K extends Key> extends SingleExpressionRenderer<R, K> {
+public class BeginsWithExpression<R extends DynamoRecord<R>, K extends Key> extends SingleExpressionRenderer<R, K> {
 
     private final String prefix;
 

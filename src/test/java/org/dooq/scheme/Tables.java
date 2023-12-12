@@ -1,4 +1,4 @@
-package org.dooq;
+package org.dooq.scheme;
 
 
 public class Tables {

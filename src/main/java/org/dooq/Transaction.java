@@ -1,9 +1,9 @@
 package org.dooq;
 
-import org.dooq.api.AbstractRecord;
+import org.dooq.api.DynamoRecord;
 import org.dooq.api.Table;
-import org.dooq.core.response.BufferedTransactWriteItemsResponse;
 import org.dooq.core.DynamoOperation;
+import org.dooq.core.response.BufferedTransactWriteItemsResponse;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awssdk.services.dynamodb.model.TransactWriteItem;
 import software.amazon.awssdk.services.dynamodb.model.TransactWriteItemsRequest;
@@ -19,7 +19,7 @@ import java.util.logging.Logger;
  *
  * @author alex
  */
-public class Transaction<R extends AbstractRecord<R>, K extends Key> extends DynamoOperation<R, K> {
+public class Transaction<R extends DynamoRecord<R>, K extends Key> extends DynamoOperation<R, K> {
 
     private TransactWriteItemsRequest.Builder builder;
     private final List<DeleteOperation<R, K>> deleteOperationList = new ArrayList<>();

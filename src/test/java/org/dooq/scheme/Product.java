@@ -1,4 +1,4 @@
-package org.dooq;
+package org.dooq.scheme;
 
 import org.dooq.api.*;
 import org.dooq.core.schema.Index;
@@ -11,7 +11,7 @@ import java.util.Set;
 public class Product extends Table<ProductRecord, ProductKey> {
 
     public final StringField<String, ProductRecord, ProductKey> UUID = FieldBuilder.sort("uuid", String.class, this);
-    public final Field<Long, ProductRecord, ProductKey> CONTENTID = FieldBuilder.partition("contentId", Long.class, this);
+    public final Field<Long, ProductRecord, ProductKey> COMPANYID = FieldBuilder.partition("companyId", Long.class, this);
     public final Field<Long, ProductRecord, ProductKey> STOCK = FieldBuilder.partition("stock", Long.class, this);
     public final Field<String, ProductRecord, ProductKey> SKU = FieldBuilder.of("sku", String.class, this);
     public final Field<String, ProductRecord, ProductKey> DESCRIPTION = FieldBuilder.of("description", String.class, this);
@@ -38,8 +38,8 @@ public class Product extends Table<ProductRecord, ProductKey> {
                 .localOnlyKeys(DEPARTMENTID)
                 .localOnlyKeys(PURCHASEUNITID)
                 .localOnlyKeys(SALESUNITID)
-                .globalInclude("category", CONTENTID, CATEGORYID, Set.of(IMAGEURL, SALESUNITID, AUTOWEIGH, DESCRIPTION, SKU, BULK))
-                .globalInclude("type", CONTENTID, CATEGORYID, Set.of(IMAGEURL, SALESUNITID, AUTOWEIGH, DESCRIPTION, SKU, BULK, CATEGORYID))
+                .globalInclude("category", COMPANYID, CATEGORYID, Set.of(IMAGEURL, SALESUNITID, AUTOWEIGH, DESCRIPTION, SKU, BULK))
+                .globalInclude("type", COMPANYID, CATEGORYID, Set.of(IMAGEURL, SALESUNITID, AUTOWEIGH, DESCRIPTION, SKU, BULK, CATEGORYID))
                 .build();
     }
 
@@ -66,7 +66,7 @@ public class Product extends Table<ProductRecord, ProductKey> {
 
     @Override
     public Column<ProductRecord, ProductKey> getPartitionColumn() {
-        return CONTENTID;
+        return COMPANYID;
     }
 
     @Override

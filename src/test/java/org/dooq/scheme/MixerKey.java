@@ -1,5 +1,6 @@
-package org.dooq;
+package org.dooq.scheme;
 
+import org.dooq.Key;
 import org.jetbrains.annotations.NotNull;
 
 public class MixerKey extends Key {

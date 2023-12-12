@@ -1,9 +1,10 @@
-package org.dooq;
+package org.dooq.scheme;
 
-import org.dooq.api.AbstractRecord;
+import org.dooq.Key;
+import org.dooq.api.DynamoDBTable;
+import org.dooq.api.DynamoRecord;
 import org.dooq.api.PartitionKey;
 import org.dooq.api.SortKey;
-import org.dooq.api.DynamoDBTable;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -11,25 +12,24 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Set;
 
+
 @DynamoDBTable("Product")
-public class ProductRecord extends AbstractRecord<ProductRecord> {
+public class ProductRecord extends DynamoRecord<ProductRecord> {
 
     @SortKey
     private String uuid;
     @PartitionKey
-    private Long contentId;
+    private Long companyId;
     private String sku;
     private Set<String> skus;
     private String description;
     private String imageUrl;
     private String details;
-    private String purchaseUnitId;
     private String salesUnitId;
     private BigDecimal factor;
     private Boolean bulk;
     private Boolean autoWeigh;
     private Boolean favorite;
-    private String claveSat;
     private String departmentId;
     private String categoryId;
     private BigDecimal waste;
@@ -42,22 +42,13 @@ public class ProductRecord extends AbstractRecord<ProductRecord> {
     private BigDecimal minProfitPercentage;
     private BigDecimal avgPurchasePrice;
     private LocalDateTime created;
-    private String userCreatorId;
     private LocalDateTime modified;
-    private String userModifierId;
-    private Integer subscriptionAmount;
-    private Integer subscriptionUnit;
-    private Boolean saleable;
     private Map<String, BigDecimal> prices;
-
     private MixerContentRecord mixers;
-
-    public ProductRecord() {
-    }
 
     @Override
     public Key getKey() {
-        return ProductKey.of(contentId, uuid);
+        return ProductKey.of(companyId, uuid);
     }
 
     public String getUuid() {
@@ -69,12 +60,12 @@ public class ProductRecord extends AbstractRecord<ProductRecord> {
         return this;
     }
 
-    public Long getContentId() {
-        return contentId;
+    public Long getCompanyId() {
+        return companyId;
     }
 
-    public ProductRecord setContentId(Long contentId) {
-        this.contentId = contentId;
+    public ProductRecord setCompanyId(Long companyId) {
+        this.companyId = companyId;
         return this;
     }
 
@@ -123,15 +114,6 @@ public class ProductRecord extends AbstractRecord<ProductRecord> {
         return this;
     }
 
-    public String getPurchaseUnitId() {
-        return purchaseUnitId;
-    }
-
-    public ProductRecord setPurchaseUnitId(String purchaseUnitId) {
-        this.purchaseUnitId = purchaseUnitId;
-        return this;
-    }
-
     public String getSalesUnitId() {
         return salesUnitId;
     }
@@ -174,15 +156,6 @@ public class ProductRecord extends AbstractRecord<ProductRecord> {
 
     public ProductRecord setFavorite(Boolean favorite) {
         this.favorite = favorite;
-        return this;
-    }
-
-    public String getClaveSat() {
-        return claveSat;
-    }
-
-    public ProductRecord setClaveSat(String claveSat) {
-        this.claveSat = claveSat;
         return this;
     }
 
@@ -294,57 +267,12 @@ public class ProductRecord extends AbstractRecord<ProductRecord> {
         return this;
     }
 
-    public String getUserCreatorId() {
-        return userCreatorId;
-    }
-
-    public ProductRecord setUserCreatorId(String userCreatorId) {
-        this.userCreatorId = userCreatorId;
-        return this;
-    }
-
     public LocalDateTime getModified() {
         return modified;
     }
 
     public ProductRecord setModified(LocalDateTime modified) {
         this.modified = modified;
-        return this;
-    }
-
-    public String getUserModifierId() {
-        return userModifierId;
-    }
-
-    public ProductRecord setUserModifierId(String userModifierId) {
-        this.userModifierId = userModifierId;
-        return this;
-    }
-
-    public Integer getSubscriptionAmount() {
-        return subscriptionAmount;
-    }
-
-    public ProductRecord setSubscriptionAmount(Integer subscriptionAmount) {
-        this.subscriptionAmount = subscriptionAmount;
-        return this;
-    }
-
-    public Integer getSubscriptionUnit() {
-        return subscriptionUnit;
-    }
-
-    public ProductRecord setSubscriptionUnit(Integer subscriptionUnit) {
-        this.subscriptionUnit = subscriptionUnit;
-        return this;
-    }
-
-    public Boolean getSaleable() {
-        return saleable;
-    }
-
-    public ProductRecord setSaleable(Boolean saleable) {
-        this.saleable = saleable;
         return this;
     }
 
@@ -357,39 +285,12 @@ public class ProductRecord extends AbstractRecord<ProductRecord> {
         return this;
     }
 
-    @Override
-    public String toString() {
-        return "ProductRecord{" +
-                "uuid='" + uuid + '\'' +
-                ", contentId=" + contentId +
-                ", sku='" + sku + '\'' +
-                ", skus='" + skus + '\'' +
-                ", description='" + description + '\'' +
-                ", imageUrl='" + imageUrl + '\'' +
-                ", details='" + details + '\'' +
-                ", purchaseUnitId='" + purchaseUnitId + '\'' +
-                ", salesUnitId='" + salesUnitId + '\'' +
-                ", factor=" + factor +
-                ", bulk=" + bulk +
-                ", autoWeigh=" + autoWeigh +
-                ", favorite=" + favorite +
-                ", claveSat='" + claveSat + '\'' +
-                ", departmentId='" + departmentId + '\'' +
-                ", categoryId='" + categoryId + '\'' +
-                ", waste=" + waste +
-                ", type=" + type +
-                ", saleable=" + saleable +
-                ", weight=" + weight +
-                ", customsName='" + customsName + '\'' +
-                ", customsDocDate=" + customsDocDate +
-                ", customsDocNumber='" + customsDocNumber + '\'' +
-                ", propertyAccount='" + propertyAccount + '\'' +
-                ", minProfitPercentage=" + minProfitPercentage +
-                ", avgPurchasePrice=" + avgPurchasePrice +
-                ", created=" + created +
-                ", userCreatorId='" + userCreatorId + '\'' +
-                ", modified=" + modified +
-                ", userModifierId='" + userModifierId + '\'' +
-                '}';
+    public MixerContentRecord getMixers() {
+        return mixers;
+    }
+
+    public ProductRecord setMixers(MixerContentRecord mixers) {
+        this.mixers = mixers;
+        return this;
     }
 }

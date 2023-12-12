@@ -1,10 +1,10 @@
 package org.dooq.expressions;
 
-import org.dooq.api.AbstractRecord;
+import org.dooq.Key;
 import org.dooq.api.Column;
+import org.dooq.api.DynamoRecord;
 import org.dooq.core.AttributeWriter;
 import org.dooq.engine.RendererContext;
-import org.dooq.Key;
 import org.dooq.engine.SingleExpressionRenderer;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -14,7 +14,7 @@ import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import java.util.Collections;
 import java.util.Map;
 
-public class BetweenExpression<R extends AbstractRecord<R>, K extends Key> extends SingleExpressionRenderer<R, K> {
+public class BetweenExpression<R extends DynamoRecord<R>, K extends Key> extends SingleExpressionRenderer<R, K> {
 
     private final Object a;
     private final Object b;
@@ -49,7 +49,7 @@ public class BetweenExpression<R extends AbstractRecord<R>, K extends Key> exten
         return Map.of(":a" + prefix, AttributeWriter.parse(a), ":b" + prefix, AttributeWriter.parse(b));
     }
 
-    public static class PreBetweenExpression<R extends AbstractRecord<R>, K extends Key> {
+    public static class PreBetweenExpression<R extends DynamoRecord<R>, K extends Key> {
 
         private final Column<R, K> column;
         private final Object a;

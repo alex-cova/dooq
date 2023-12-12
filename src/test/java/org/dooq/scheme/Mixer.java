@@ -1,4 +1,4 @@
-package org.dooq;
+package org.dooq.scheme;
 
 
 import org.dooq.api.Column;
@@ -19,7 +19,7 @@ public class Mixer extends Table<MixerRecord, MixerKey> {
     public final Field<String, MixerRecord, MixerKey> GROUPUUID = FieldBuilder.of("groupUuid", String.class, this);
     public final Field<String, MixerRecord, MixerKey> QUANTITY = FieldBuilder.of("quantity", String.class, this);
     public final Field<String, MixerRecord, MixerKey> ORDER = FieldBuilder.of("order", String.class, this);
-    public final Field<String, MixerRecord, MixerKey> CONTENTID = FieldBuilder.of("contentId", String.class, this);
+    public final Field<String, MixerRecord, MixerKey> COMPANYID = FieldBuilder.of("companyId", String.class, this);
     public final Field<String, MixerRecord, MixerKey> EXTRA = FieldBuilder.of("extra", String.class, this);
     public final Field<String, MixerRecord, MixerKey> TAGNAME = FieldBuilder.of("tagName", String.class, this);
     public final Field<String, MixerRecord, MixerKey> EXTRACOST = FieldBuilder.of("extraCost", String.class, this);
@@ -40,8 +40,8 @@ public class Mixer extends Table<MixerRecord, MixerKey> {
         INDICES = Index.builder(this)
                 .localOnlyKeys(PRODUCTUUID)
                 .localOnlyKeys(TAGNAME)
-                .globalOnlyKeys("group", CONTENTID, GROUPUUID)
-                .globalInclude(CONTENT, CONTENTID, UUID, Set.of(CONTENT, PRODUCTUUID))
+                .globalOnlyKeys("group", COMPANYID, GROUPUUID)
+                .globalInclude(CONTENT, COMPANYID, UUID, Set.of(CONTENT, PRODUCTUUID))
                 .build();
     }
 

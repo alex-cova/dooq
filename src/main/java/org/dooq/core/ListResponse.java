@@ -1,10 +1,11 @@
 package org.dooq.core;
 
 import org.dooq.Key;
-import org.dooq.api.AbstractRecord;
 import org.dooq.api.Column;
 import org.dooq.api.DynamoConverter;
+import org.dooq.api.DynamoRecord;
 import org.dooq.api.Table;
+import org.dooq.parser.ObjectParser;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -16,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public interface ListResponse<R extends AbstractRecord<R>, K extends Key> extends Response {
+public interface ListResponse<R extends DynamoRecord<R>, K extends Key> extends Response {
 
     Table<R, K> getTable();
 
@@ -44,13 +45,19 @@ public interface ListResponse<R extends AbstractRecord<R>, K extends Key> extend
 
     }
 
+    default <T> @Nullable T one(@NotNull ObjectParser<T> parse) {
+        if (isEmpty()) return null;
+
+        return parse.read(getItems().get(0));
+    }
+
     default <T> @NotNull List<T> into(Class<T> type) {
 
         if (isEmpty()) return Collections.emptyList();
 
         var sameTable = false;
 
-        if (AbstractRecord.class.isAssignableFrom(type)) {
+        if (DynamoRecord.class.isAssignableFrom(type)) {
             sameTable = getTable().getRecordType() == type;
         }
 
@@ -62,11 +69,20 @@ public interface ListResponse<R extends AbstractRecord<R>, K extends Key> extend
 
         if (sameTable) {
             for (T item : items) {
-                ((AbstractRecord<?>) item).$setTable(getTable());
+                ((DynamoRecord<?>) item).$setTable(getTable());
             }
         }
 
         return items;
+    }
+
+    default <T> @NotNull List<T> into(ObjectParser<T> parser) {
+
+        if (isEmpty()) return Collections.emptyList();
+
+        return getItems().stream()
+                .map(parser::read)
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     default @Nullable String getLastEvaluatedKey(Column<R, K> column) {

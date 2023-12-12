@@ -1,14 +1,14 @@
 package org.dooq.util;
 
 import org.dooq.Key;
-import org.dooq.api.AbstractRecord;
 import org.dooq.api.Column;
 import org.dooq.api.ColumnType;
+import org.dooq.api.DynamoRecord;
 import org.dooq.api.Table;
 
 import java.util.Objects;
 
-public record AbstractColumn<R extends AbstractRecord<R>, K
+public record AbstractColumn<R extends DynamoRecord<R>, K
         extends Key>(Table<R, K> table, String name) implements Column<R, K> {
 
     @Override

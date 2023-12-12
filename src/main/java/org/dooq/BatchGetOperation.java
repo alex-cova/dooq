@@ -1,21 +1,19 @@
 package org.dooq;
 
-import org.dooq.api.AbstractRecord;
 import org.dooq.api.Column;
+import org.dooq.api.DynamoRecord;
 import org.dooq.api.Table;
-import org.dooq.core.response.BufferedBatchGetItemResponse;
 import org.dooq.core.DynamoOperation;
+import org.dooq.core.response.BufferedBatchGetItemResponse;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
+import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.BatchGetItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.BatchGetItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.KeysAndAttributes;
-import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -29,7 +27,7 @@ import java.util.stream.Stream;
  * @param <R>
  * @param <K>
  */
-public class BatchGetOperation<R extends AbstractRecord<R>, K extends Key> extends DynamoOperation<R, K> {
+public class BatchGetOperation<R extends DynamoRecord<R>, K extends Key> extends DynamoOperation<R, K> {
 
     private DynamoDbClient client;
     private final BatchGetItemRequest.Builder builder;
@@ -113,7 +111,7 @@ public class BatchGetOperation<R extends AbstractRecord<R>, K extends Key> exten
         return this;
     }
 
-    public static <R extends AbstractRecord<R>, K extends Key> @NotNull BatchGetOperation<R, K> from(Table<R, K> table) {
+    public static <R extends DynamoRecord<R>, K extends Key> @NotNull BatchGetOperation<R, K> from(Table<R, K> table) {
         return new BatchGetOperation<>(table);
     }
 

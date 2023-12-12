@@ -1,15 +1,15 @@
 package org.dooq;
 
-import org.dooq.api.AbstractRecord;
 import org.dooq.api.Column;
+import org.dooq.api.DynamoRecord;
 import org.dooq.api.Table;
+import org.dooq.core.AttributeWriter;
 import org.dooq.core.DynamoOperation;
+import org.dooq.core.ListResponse;
 import org.dooq.core.exception.DynamoOperationException;
 import org.dooq.core.response.BufferedScanResponse;
 import org.dooq.engine.ExpressionCompiler;
 import org.dooq.engine.ExpressionRenderer;
-import org.dooq.core.AttributeWriter;
-import org.dooq.core.ListResponse;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
@@ -28,7 +28,7 @@ import java.util.logging.Logger;
  * In general, Scan operations are less efficient than other operations in DynamoDB. A Scan operation always scans the entire table or secondary index.
  * It then filters out values to provide the result you want, essentially adding the extra step of removing data from the result set.
  */
-public class ScanOperation<R extends AbstractRecord<R>, K extends Key> extends DynamoOperation<R, K> {
+public class ScanOperation<R extends DynamoRecord<R>, K extends Key> extends DynamoOperation<R, K> {
 
     private ScanRequest.Builder builder;
     private Column<R, K> index;

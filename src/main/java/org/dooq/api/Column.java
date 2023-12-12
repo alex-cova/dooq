@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public interface Column<R extends AbstractRecord<R>, K extends Key> {
+public interface Column<R extends DynamoRecord<R>, K extends Key> {
 
     String name();
 

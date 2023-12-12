@@ -1,11 +1,11 @@
 package org.dooq.core;
 
-import org.dooq.api.AbstractRecord;
 import org.dooq.Key;
+import org.dooq.api.DynamoRecord;
 import org.dooq.api.Table;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 
-public class DynamoOperation<R extends AbstractRecord<R>, K extends Key> {
+public class DynamoOperation<R extends DynamoRecord<R>, K extends Key> {
 
     private final Table<R, K> table;
 

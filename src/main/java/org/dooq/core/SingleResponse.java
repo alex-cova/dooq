@@ -1,9 +1,10 @@
 package org.dooq.core;
 
 import org.dooq.Key;
-import org.dooq.api.AbstractRecord;
 import org.dooq.api.Column;
+import org.dooq.api.DynamoRecord;
 import org.dooq.api.Table;
+import org.dooq.parser.ObjectParser;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -14,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-public interface SingleResponse<R extends AbstractRecord<R>, K extends Key> extends Response {
+public interface SingleResponse<R extends DynamoRecord<R>, K extends Key> extends Response {
 
     Map<String, AttributeValue> getItem();
 
@@ -44,6 +45,15 @@ public interface SingleResponse<R extends AbstractRecord<R>, K extends Key> exte
         return ItemParser.readRecord(getItem(), clazz);
     }
 
+    default <T> @Nullable T into(ObjectParser<T> converter) {
+
+        if (isEmpty()) {
+            return null;
+        }
+
+        return converter.read(getItem());
+    }
+
     default <T> T get(Column<?, ?> column, Function<AttributeValue, T> function) {
 
         if (isEmpty()) throw new IllegalStateException("No item");
@@ -55,7 +65,7 @@ public interface SingleResponse<R extends AbstractRecord<R>, K extends Key> exte
     }
 
     @Contract(value = "_ -> new", pure = true)
-    static <R extends AbstractRecord<R>, K extends Key> @NotNull ListResponse<R, K> asListResponse(SingleResponse<R, K> response) {
+    static <R extends DynamoRecord<R>, K extends Key> @NotNull ListResponse<R, K> asListResponse(SingleResponse<R, K> response) {
         return new ListResponse<>() {
             @Override
             public Table<R, K> getTable() {

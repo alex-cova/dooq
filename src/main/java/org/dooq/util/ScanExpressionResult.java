@@ -1,14 +1,14 @@
 package org.dooq.util;
 
 import org.dooq.Key;
-import org.dooq.api.AbstractRecord;
 import org.dooq.api.Column;
+import org.dooq.api.DynamoRecord;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public final class ScanExpressionResult<R extends AbstractRecord<R>, K extends Key> {
+public final class ScanExpressionResult<R extends DynamoRecord<R>, K extends Key> {
     private final String expression;
     private final Map<String, Object> values;
     private final Map<String, String> attributeNames;

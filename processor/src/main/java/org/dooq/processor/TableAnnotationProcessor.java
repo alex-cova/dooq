@@ -11,10 +11,7 @@ import java.io.Writer;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Logger;
 
 @SupportedAnnotationTypes("org.dooq.api.DynamoDBTable")
@@ -219,15 +216,7 @@ public class TableAnnotationProcessor extends AbstractProcessor {
                 .append(" extends Table<%s, %s>".formatted(recordName, keyName))
                 .append(" {\n\n");
 
-        builder.append("\tpublic ")
-                .append(tableName)
-                .append("() {\n")
-                .append("\t\tCOLUMNS = columns();\n");
-
         //TODO build indices
-
-        builder.append("\t}\n\n");
-
 
         List<? extends Element> enclosedElements = element.getEnclosedElements();
 
@@ -236,6 +225,8 @@ public class TableAnnotationProcessor extends AbstractProcessor {
 
         VariableElement partition = null;
         VariableElement sort = null;
+
+        Set<String> fieldNames = new HashSet<>();
 
         // Process only the fields within the enclosed elements
         for (Element enclosedElement : enclosedElements) {
@@ -261,6 +252,7 @@ public class TableAnnotationProcessor extends AbstractProcessor {
                 }
 
                 final var type = fieldElement.asType().toString();
+                final var fieldName = fieldElement.getSimpleName().toString().toUpperCase();
 
                 builder.append("\tpublic final ")
                         .append(getFieldType(type))
@@ -271,17 +263,27 @@ public class TableAnnotationProcessor extends AbstractProcessor {
                         .append(", ")
                         .append(keyName)
                         .append("> ")
-                        .append(fieldElement.getSimpleName().toString().toUpperCase())
+                        .append(fieldName)
                         .append(" = ")
                         .append(buildField(fieldElement, columnName));
+
+                fieldNames.add(fieldName);
 
             }
         }
 
-
-        builder.append("\n\n")
+        builder.append("\n")
                 .append("\tprivate final List<Column<%s, %s>> COLUMNS;"
-                        .formatted(recordName, keyName));
+                        .formatted(recordName, keyName))
+                .append("\n\n");
+
+        builder.append("\tpublic ")
+                .append(tableName)
+                .append("() {\n")
+                .append("\t\tCOLUMNS = java.util.List.of(")
+                .append(String.join(", ", fieldNames))
+                .append(");\n")
+                .append("\t}\n\n");
 
         if (globalIndices != null && localIndices != null) {
             builder.append("\n\n")
@@ -381,7 +383,7 @@ public class TableAnnotationProcessor extends AbstractProcessor {
                 .append("@DynamoDBTable(\"%s\")\n".formatted(annot.value()))
                 .append("public class ")
                 .append(className)
-                .append(" extends AbstractRecord<%s> {\n\n".formatted(className));
+                .append(" extends DynamoRecord<%s> {\n\n".formatted(className));
 
         List<? extends Element> enclosedElements = element.getEnclosedElements();
 

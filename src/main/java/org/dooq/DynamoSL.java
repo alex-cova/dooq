@@ -1,14 +1,13 @@
 package org.dooq;
 
-import org.dooq.api.AbstractRecord;
 import org.dooq.api.Column;
 import org.dooq.api.DynamoConverter;
-import org.dooq.core.response.BufferedBatchWriteItemResponse;
-import org.dooq.core.response.BufferedGetResponse;
-import org.dooq.parser.ParserCompiler;
-import org.dooq.projection.Projection;
+import org.dooq.api.DynamoRecord;
 import org.dooq.api.Table;
 import org.dooq.core.ItemParser;
+import org.dooq.core.response.BufferedBatchWriteItemResponse;
+import org.dooq.core.response.BufferedGetResponse;
+import org.dooq.projection.Projection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
@@ -39,12 +38,12 @@ public class DynamoSL {
         return client;
     }
 
-    public <R extends AbstractRecord<R>, K extends Key> @NotNull UpdateOperation<R, K> update(Table<R, K> table) {
+    public <R extends DynamoRecord<R>, K extends Key> @NotNull UpdateOperation<R, K> update(Table<R, K> table) {
         return new UpdateOperation<>(table)
                 .setClient(client);
     }
 
-    public <R extends AbstractRecord<R>, K extends Key> @NotNull DeleteOperation<R, K> deleteFrom(Table<R, K> table) {
+    public <R extends DynamoRecord<R>, K extends Key> @NotNull DeleteOperation<R, K> deleteFrom(Table<R, K> table) {
         return new DeleteOperation<>(table)
                 .setClient(client);
     }
@@ -119,33 +118,33 @@ public class DynamoSL {
         return new BufferedBatchWriteItemResponse(response);
     }
 
-    public <R extends AbstractRecord<R>, K extends Key> GetOperation<R, K> selectFrom(Table<R, K> table) {
+    public <R extends DynamoRecord<R>, K extends Key> GetOperation<R, K> selectFrom(Table<R, K> table) {
         return new GetOperation<>(table, Collections.emptyList())
                 .setClient(client);
     }
 
-    public <R extends AbstractRecord<R>, K extends Key> PreInsert<R, K> insertInto(Table<R, K> table) {
+    public <R extends DynamoRecord<R>, K extends Key> PreInsert<R, K> insertInto(Table<R, K> table) {
         return new PreInsert<>(table, client);
     }
 
-    public <R extends AbstractRecord<R>, K extends Key> BatchDeleteOperation<R, K> batchDelete(Table<R, K> table) {
+    public <R extends DynamoRecord<R>, K extends Key> BatchDeleteOperation<R, K> batchDelete(Table<R, K> table) {
         return new BatchDeleteOperation<>(table, client);
     }
 
-    public <R extends AbstractRecord<R>, K extends Key> BatchPutOperation<R, K> batchPut(Table<R, K> table) {
+    public <R extends DynamoRecord<R>, K extends Key> BatchPutOperation<R, K> batchPut(Table<R, K> table) {
         return new BatchPutOperation<>(table, client);
     }
 
-    public <R extends AbstractRecord<R>, K extends Key> BatchGetOperation<R, K> batchGet(Table<R, K> table) {
+    public <R extends DynamoRecord<R>, K extends Key> BatchGetOperation<R, K> batchGet(Table<R, K> table) {
         return new BatchGetOperation<>(table, client);
     }
 
-    public <R extends AbstractRecord<R>, K extends Key> TableIterator<R, K> iterate(Table<R, K> table) {
+    public <R extends DynamoRecord<R>, K extends Key> TableIterator<R, K> iterate(Table<R, K> table) {
         return new TableIterator<>(table)
                 .setClient(client);
     }
 
-    public <R extends AbstractRecord<R>, K extends Key> Transaction<R, K> transaction(Table<R, K> table) {
+    public <R extends DynamoRecord<R>, K extends Key> Transaction<R, K> transaction(Table<R, K> table) {
         return new Transaction<>(table);
     }
 
@@ -182,33 +181,33 @@ public class DynamoSL {
                 .isEmpty();
     }
 
-    public <R extends AbstractRecord<R>, K extends Key> ScanOperation<R, K> scan(Table<R, K> table) {
+    public <R extends DynamoRecord<R>, K extends Key> ScanOperation<R, K> scan(Table<R, K> table) {
         return new ScanOperation<>(table)
                 .setClient(client);
     }
 
-    public final <T, R extends AbstractRecord<R>, K extends Key> ProjectedGet<Projection.ProjectionResult1<T>, R, K>
+    public final <T, R extends DynamoRecord<R>, K extends Key> ProjectedGet<Projection.ProjectionResult1<T>, R, K>
     select(org.dooq.api.Field<T, R, K> column) {
         return ProjectedGet.of(column.table(), column)
                 .setClient(client);
     }
 
     @SafeVarargs
-    public final <R extends AbstractRecord<R>, K extends Key> PreGet<R, K> select(Column<R, K>... columns) {
+    public final <R extends DynamoRecord<R>, K extends Key> PreGet<R, K> select(Column<R, K>... columns) {
         return PreGet.get(columns)
                 .setClient(client);
     }
 
-    public final <R extends AbstractRecord<R>, K extends Key> PreGet<R, K> select(List<Column<R, K>> columns) {
+    public final <R extends DynamoRecord<R>, K extends Key> PreGet<R, K> select(List<Column<R, K>> columns) {
         return PreGet.get(columns)
                 .setClient(client);
     }
 
     @SuppressWarnings("SuspiciousMethodCalls")
-    public <T extends AbstractRecord<T>> void update(@NotNull AbstractRecord<T> record) {
+    public <T extends DynamoRecord<T>> void update(@NotNull DynamoRecord<T> record) {
         Objects.requireNonNull(record.getRepresentation());
 
-        AbstractRecord<?> original = ItemParser.readRecord(record.getRepresentation(), record.getClass());
+        DynamoRecord<?> original = ItemParser.readRecord(record.getRepresentation(), record.getClass());
 
         Map<String, ? extends Column<T, ?>> columnMap = record.getTable().getColumns()
                 .stream()
@@ -242,7 +241,7 @@ public class DynamoSL {
         update.execute(client);
     }
 
-    public <T extends AbstractRecord<T>> PutItemResponse store(@NotNull T object) {
+    public <T extends DynamoRecord<T>> PutItemResponse store(@NotNull T object) {
 
         Objects.requireNonNull(object.getTable(), "You must specify the target table using dsl.newRecord(table)");
 
@@ -252,7 +251,7 @@ public class DynamoSL {
 
     }
 
-    public <T extends AbstractRecord<T>> T newRecord(@NotNull Table<T, ?> table) {
+    public <T extends DynamoRecord<T>> T newRecord(@NotNull Table<T, ?> table) {
 
         T value = DynamoConverter.getConverter(table.getRecordType()).newInstance();
 
@@ -265,7 +264,7 @@ public class DynamoSL {
     /**
      * @See https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_BatchWriteItem.html
      */
-    public final <T extends AbstractRecord<T>> @Nullable BufferedBatchWriteItemResponse store(@NotNull List<? extends AbstractRecord<T>> records) {
+    public final <T extends DynamoRecord<T>> @Nullable BufferedBatchWriteItemResponse store(@NotNull List<? extends DynamoRecord<T>> records) {
         if (records.isEmpty()) return null;
 
 
@@ -276,7 +275,7 @@ public class DynamoSL {
         BufferedBatchWriteItemResponse response = new BufferedBatchWriteItemResponse();
 
         for (int i = 0; i < records.size(); i += 25) {
-            List<? extends AbstractRecord<T>> recordList = records.subList(i, Math.min(records.size(), i + 25));
+            List<? extends DynamoRecord<T>> recordList = records.subList(i, Math.min(records.size(), i + 25));
 
             response.append(storeCollection(recordList));
         }
@@ -284,13 +283,13 @@ public class DynamoSL {
         return response;
     }
 
-    private <T extends AbstractRecord<T>> BatchWriteItemResponse storeCollection(@NotNull Collection<? extends AbstractRecord<T>> records) {
+    private <T extends DynamoRecord<T>> BatchWriteItemResponse storeCollection(@NotNull Collection<? extends DynamoRecord<T>> records) {
 
         Map<String, List<WriteRequest>> requests = new HashMap<>();
 
         List<WriteRequest> writeRequests = new ArrayList<>();
 
-        for (AbstractRecord<T> record : records) {
+        for (DynamoRecord<T> record : records) {
 
             requests.putIfAbsent(record.getTable().getTableName(), writeRequests);
 

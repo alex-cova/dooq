@@ -24,11 +24,11 @@ public record Index(String name, IndexType type, String partitionKey, String sor
     }
 
     @Contract("_ -> new")
-    public static <R extends AbstractRecord<R>, K extends Key> @NotNull Builder<R, K> builder(Table<R, K> table) {
+    public static <R extends DynamoRecord<R>, K extends Key> @NotNull Builder<R, K> builder(Table<R, K> table) {
         return new Builder<>(table);
     }
 
-    public static class Builder<R extends AbstractRecord<R>, K extends Key> {
+    public static class Builder<R extends DynamoRecord<R>, K extends Key> {
 
         private final Map<String, Index> map = new HashMap<>();
         private final Table<R, K> table;

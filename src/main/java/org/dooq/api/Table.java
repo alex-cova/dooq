@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 /**
  * A DynamoDB table.
  */
-public abstract class Table<R extends AbstractRecord<R>, K extends Key> {
+public abstract class Table<R extends DynamoRecord<R>, K extends Key> {
 
     public abstract List<Column<R, K>> getColumns();
 

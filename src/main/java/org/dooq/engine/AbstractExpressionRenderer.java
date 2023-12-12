@@ -1,8 +1,8 @@
 package org.dooq.engine;
 
 import org.dooq.Key;
-import org.dooq.api.AbstractRecord;
 import org.dooq.api.Column;
+import org.dooq.api.DynamoRecord;
 import org.dooq.core.AttributeWriter;
 import org.jetbrains.annotations.Nullable;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public abstract class AbstractExpressionRenderer<R extends AbstractRecord<R>, K extends Key> implements ExpressionRenderer<R, K> {
+public abstract class AbstractExpressionRenderer<R extends DynamoRecord<R>, K extends Key> implements ExpressionRenderer<R, K> {
 
     @Override
     public Map<String, String> getAttributeNames() {

@@ -1,8 +1,8 @@
 package org.dooq.expressions;
 
 import org.dooq.Key;
-import org.dooq.api.AbstractRecord;
 import org.dooq.api.Column;
+import org.dooq.api.DynamoRecord;
 import org.dooq.engine.RendererContext;
 import org.dooq.engine.SingleExpressionRenderer;
 import org.jetbrains.annotations.NotNull;
@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * see: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Query.html
  */
-public class ConditionExpression<R extends AbstractRecord<R>, K extends Key> extends SingleExpressionRenderer<R, K> {
+public class ConditionExpression<R extends DynamoRecord<R>, K extends Key> extends SingleExpressionRenderer<R, K> {
 
     private final Comparator comparator;
     private final Object value;

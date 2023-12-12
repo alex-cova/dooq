@@ -1,8 +1,8 @@
 package org.dooq.expressions;
 
 import org.dooq.Key;
-import org.dooq.api.AbstractRecord;
 import org.dooq.api.Column;
+import org.dooq.api.DynamoRecord;
 import org.dooq.engine.RendererContext;
 import org.dooq.engine.SingleExpressionRenderer;
 import org.jetbrains.annotations.NotNull;
@@ -18,7 +18,7 @@ import java.util.Map;
  * <p>
  * attribute_exists (#Pictures.#SideView)
  */
-public class AttributeExistsExpression<R extends AbstractRecord<R>, K extends Key> extends SingleExpressionRenderer<R, K> {
+public class AttributeExistsExpression<R extends DynamoRecord<R>, K extends Key> extends SingleExpressionRenderer<R, K> {
 
     public AttributeExistsExpression(Column<R, K> column) {
         super(column);
