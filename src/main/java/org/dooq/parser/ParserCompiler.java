@@ -4,10 +4,7 @@ import org.dooq.api.ColumnAlias;
 import org.dooq.api.DynamoIgnore;
 import org.dooq.api.PartitionKey;
 import org.dooq.api.SortKey;
-import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.*;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
@@ -711,7 +708,7 @@ public class ParserCompiler extends ClassLoader {
         constructorMv.visitEnd();
     }
 
-    private static List<Field> getFields(@NotNull Class<?> type) {
+    private static @Unmodifiable List<Field> getFields(@NotNull Class<?> type) {
 
         if (type.isRecord()) {
             return Arrays.stream(type.getDeclaredFields())
@@ -719,11 +716,15 @@ public class ParserCompiler extends ClassLoader {
         }
 
         return Arrays.stream(type.getDeclaredFields())
-                .filter(field -> !field.isAnnotationPresent(Transient.class) ||
-                        !Modifier.isTransient(field.getModifiers()) ||
-                        !Modifier.isFinal(field.getModifiers()) ||
-                        !field.isAnnotationPresent(DynamoIgnore.class))
+                .filter(ParserCompiler::isWritable)
                 .toList();
+    }
+
+    private static boolean isWritable(@NotNull Field field) {
+        return !Modifier.isTransient(field.getModifiers()) ||
+                !Modifier.isFinal(field.getModifiers()) ||
+                !Modifier.isStatic(field.getModifiers()) ||
+                !field.isAnnotationPresent(DynamoIgnore.class);
     }
 
     @SuppressWarnings("rawtypes")
@@ -775,11 +776,17 @@ public class ParserCompiler extends ClassLoader {
 
 
     static boolean isCustomClass(@NotNull Class<?> type) {
-        return !type.getName().startsWith("java");
+        return !isJVMClass(type);
     }
 
     static boolean isJVMClass(@NotNull Class<?> type) {
-        return type.getName().startsWith("java");
+
+        if (type.isArray()) return true;
+        if (type.isPrimitive()) return true;
+        if (type == String.class) return true;
+
+        return type.getName().startsWith("java") ||
+                type.getName().startsWith("sun");
     }
 
 
