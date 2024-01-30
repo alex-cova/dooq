@@ -1,5 +1,7 @@
 package org.dooq.mapper;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dooq.core.ItemParser;
 import org.dooq.scheme.ProductRecord;
 import org.dooq.scheme.Tables;
@@ -11,9 +13,11 @@ import java.math.BigDecimal;
 public class ObjectMapperTest {
 
     @Test
-    void testMapping() {
+    void testMapping() throws JsonProcessingException {
 
-        var object = new ProductRecord()
+        var mapper = new ObjectMapper();
+
+        var record = new ProductRecord()
                 .setCompanyId(1L)
                 .setUuid("uuid")
                 .setDescription("Description")
@@ -25,14 +29,15 @@ public class ObjectMapperTest {
                 .setCustomsName("customs")
                 .setAvgPurchasePrice(new BigDecimal("12"));
 
-        object.setTable(Tables.PRODUCT);
+        record.setTable(Tables.PRODUCT);
 
-        var result = ItemParser.writeRecord(object);
+        var result = ItemParser.writeRecord(record);
 
         ProductRecord parsed = ItemParser.readRecord(result.map(), ProductRecord.class);
 
         Assertions.assertNotNull(parsed);
-        Assertions.assertEquals(object.toString(), parsed.toString());
+        Assertions.assertEquals(mapper.writeValueAsString(record),
+                mapper.writeValueAsString(parsed));
 
     }
 }

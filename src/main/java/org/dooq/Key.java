@@ -37,7 +37,8 @@ public class Key extends HashMap<String, AttributeValue> {
     }
 
 
-    public static @NotNull Key of(Column<?, ?> partition, Object value, Column<?, ?> sort, Object value2) {
+    public static @NotNull Key of(@NotNull Column<?, ?> partition, @NotNull Object value,
+                                  @NotNull Column<?, ?> sort, @NotNull Object value2) {
         var key = new Key();
 
         key.setPartitionKey(partition, value)
@@ -53,12 +54,13 @@ public class Key extends HashMap<String, AttributeValue> {
     }
 
     public Key setPartitionKey(@NotNull Column<?, ?> column, Object value) {
+        setTable(column.table().getTableName());
         setPartitionKey(column.name(), value);
 
         return this;
     }
 
-    public Key setPartitionKey(String name, Object value) {
+    public Key setPartitionKey(String name, @NotNull Object value) {
         Objects.requireNonNull(value, "Partition key '" + name + "' can't be null");
 
         if (size() > 0) {
@@ -101,7 +103,7 @@ public class Key extends HashMap<String, AttributeValue> {
 
     public Key setSortingKey(String name, Object value) {
 
-        Objects.requireNonNull(value, "Sort key '" + name + "' can't be null");
+        Objects.requireNonNull(value, "Sort key value '" + name + "' can't be null");
 
         if (size() == 0) {
             throw new IllegalStateException("Must specify the partition key first");

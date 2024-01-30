@@ -10,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.PutItemResponse;
 
+import java.beans.Transient;
 import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.Objects;
@@ -31,6 +32,7 @@ public abstract class DynamoRecord<T extends DynamoRecord<T>> {
         this.dsl = dsl;
     }
 
+    @Transient
     public abstract Key getKey();
 
     @SuppressWarnings("unchecked")
@@ -44,11 +46,12 @@ public abstract class DynamoRecord<T extends DynamoRecord<T>> {
     }
 
     public final void update() {
-        Objects.requireNonNull(dsl);
+        Objects.requireNonNull(dsl, "unable to update record without dsl");
         dsl.update(this);
     }
 
     @SuppressWarnings("unchecked")
+    @Transient
     public Table<T, ?> getTable() {
         return (Table<T, ?>) table;
     }
@@ -67,6 +70,7 @@ public abstract class DynamoRecord<T extends DynamoRecord<T>> {
         this.representation = representation;
     }
 
+    @Transient
     public final @Nullable Map<String, AttributeValue> getRepresentation() {
         return representation;
     }

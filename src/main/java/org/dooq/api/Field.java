@@ -66,13 +66,12 @@ public class Field<T, R extends DynamoRecord<R>, K extends Key> implements Colum
 
     @Contract(pure = true)
     public @Nullable MergeExpression<T> eq(@NotNull Field<T, ?, ?> field) {
-        return null;
-        //return new EqualsColumnExpression<>(this, field);
+        return new MergeExpression<>(this, field);
     }
 
     @Contract(pure = true)
-    public @Nullable MergeExpression<T> startsWith(@NotNull Field<T, ?, ?> column) {
-        return null;
+    public @Nullable MergeExpression<T> startsWith(@NotNull Field<T, ?, ?> field) {
+        return new MergeExpression<>(this, field);
     }
 
 }

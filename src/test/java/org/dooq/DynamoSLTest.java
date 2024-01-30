@@ -21,11 +21,11 @@ public class DynamoSLTest {
     @Test
     void batchStore() {
 
-        var record1 = dsl.newRecord(PRODUCT);
-        var record2 = dsl.newRecord(PRODUCT);
-        var record3 = dsl.newRecord(PRODUCT);
-        var record4 = dsl.newRecord(PRODUCT);
-        var record5 = dsl.newRecord(PRODUCT);
+        var record1 = dsl.newRecord(PRODUCT).setCompanyId(1L).setUuid("1234");
+        var record2 = dsl.newRecord(PRODUCT).setCompanyId(1L).setUuid("1234");
+        var record3 = dsl.newRecord(PRODUCT).setCompanyId(1L).setUuid("1234");
+        var record4 = dsl.newRecord(PRODUCT).setCompanyId(1L).setUuid("1234");
+        var record5 = dsl.newRecord(PRODUCT).setCompanyId(1L).setUuid("1234");
 
         dsl.store(List.of(record1, record2, record3, record4, record5));
     }
@@ -90,11 +90,13 @@ public class DynamoSLTest {
 
         dsl.update(PRODUCT)
                 .append(PRODUCT.STOCK, "value")
-                .where(PRODUCT.UUID.eq("1234"));
+                .where(PRODUCT.UUID.eq("1234")
+                        .and(PRODUCT.COMPANYID.eq(1L)));
 
         dsl.update(PRODUCT)
                 .append(PRODUCT.STOCK, "value")
-                .key(key -> key.partition(1));
+                .key(key -> key.partition(1)
+                        .sort("1234"));
     }
 
     @Test

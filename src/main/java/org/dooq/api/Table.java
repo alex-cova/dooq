@@ -26,7 +26,7 @@ public abstract class Table<R extends DynamoRecord<R>, K extends Key> {
 
     public abstract Column<R, K> getPartitionColumn();
 
-    public abstract Column<R, K> getSortColumn();
+    public abstract @Nullable Column<R, K> getSortColumn();
 
     private volatile ObjectParser<R> recordParser;
 
@@ -76,5 +76,9 @@ public abstract class Table<R extends DynamoRecord<R>, K extends Key> {
                 })
                 .filter(Objects::nonNull)
                 .toList();
+    }
+
+    public boolean isAbstract() {
+        return false;
     }
 }

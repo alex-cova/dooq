@@ -221,8 +221,14 @@ public class GetOperation<R extends DynamoRecord<R>, K extends Key> extends Dyna
 
         var operation = pre.build();
 
-        if (operation.key().size() == 1) {
-            throw new DynamoOperationException("Partition and Sort Key must be present");
+        if (!getTable().isAbstract() && operation.key().size() < 2) {
+            if (getTable().getSortColumn() != null) {
+                throw new DynamoOperationException("Partition and Sort Key must be present");
+            }
+
+            if (operation.key().isEmpty()) {
+                throw new DynamoOperationException("Partition Key must be present");
+            }
         }
 
         return operation;

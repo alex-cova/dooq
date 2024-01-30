@@ -50,4 +50,9 @@ public class AbstractTable extends Table<AbstractRecord, AbstractKey> {
     public Column<AbstractRecord, AbstractKey> getSortColumn() {
         return sortColumn;
     }
+
+    @Override
+    public boolean isAbstract() {
+        return true;
+    }
 }

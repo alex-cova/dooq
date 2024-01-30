@@ -7,14 +7,21 @@ import org.jetbrains.annotations.NotNull;
 
 public class DynamoSemantics {
 
-    public static @NotNull String param(Column<?, ?> column) {
+    public static @NotNull String param(@NotNull Column<?, ?> column) {
         return param(column.name());
     }
-
+    
+    /*
+     * e.g. :name
+     */
+    @Contract(pure = true)
     public static @NotNull String param(@NotNull String value) {
         return ":" + value;
     }
 
+    /*
+     * e.g. #name
+     */
     public static @NotNull String escaped(Column<?, ?> column) {
         return escaped(column.name());
     }

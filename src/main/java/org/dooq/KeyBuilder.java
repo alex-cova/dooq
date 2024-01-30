@@ -23,6 +23,13 @@ public class KeyBuilder {
     }
 
     public Key build() {
+
+        //Not all tables have a sort key
+        if (table.getSortColumn() == null) {
+            return new Key()
+                    .setPartitionKey(table.getPartitionColumn(), partitionValue);
+        }
+
         return Key.of(table.getPartitionColumn(), partitionValue, table.getSortColumn(), sortValue);
     }
 }

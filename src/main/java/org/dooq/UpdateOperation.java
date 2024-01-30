@@ -9,6 +9,7 @@ import org.dooq.core.exception.DynamoOperationException;
 import org.dooq.core.response.BufferedUpdateResponse;
 import org.dooq.engine.ExpressionRenderer;
 import org.dooq.expressions.AddExpression;
+import org.dooq.expressions.ListAppendExpression;
 import org.dooq.util.NullableValue;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
@@ -154,7 +155,9 @@ public class UpdateOperation<R extends DynamoRecord<R>, K extends Key> extends D
      * })
      */
     public UpdateOperation<R, K> append(@NotNull Column<R, K> column, @Nullable Object value) {
-        //TODO
+
+        setExpressions.add(new ListAppendExpression<>(column));
+        attributeValueMap.put(column.param(), AttributeWriter.parse(value));
 
         return this;
     }

@@ -6,6 +6,8 @@ import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.*;
 
+import java.util.function.Consumer;
+
 @SuppressWarnings("all")
 public class FakeDynamoDBClient implements DynamoDbClient {
 
@@ -57,6 +59,25 @@ public class FakeDynamoDBClient implements DynamoDbClient {
         }
 
         Assertions.fail("Last request was " + lastRequest.getClass().getSimpleName());
+    }
+
+    @Override
+    public BatchWriteItemResponse batchWriteItem(BatchWriteItemRequest batchWriteItemRequest) throws ProvisionedThroughputExceededException, ResourceNotFoundException, ItemCollectionSizeLimitExceededException, RequestLimitExceededException, InternalServerErrorException, AwsServiceException, SdkClientException, DynamoDbException {
+        this.lastRequest = batchWriteItemRequest;
+
+        printRequest(batchWriteItemRequest);
+
+        return BatchWriteItemResponse.builder().build();
+    }
+
+    @Override
+    public BatchWriteItemResponse batchWriteItem(Consumer<BatchWriteItemRequest.Builder> batchWriteItemRequest) throws ProvisionedThroughputExceededException, ResourceNotFoundException, ItemCollectionSizeLimitExceededException, RequestLimitExceededException, InternalServerErrorException, AwsServiceException, SdkClientException, DynamoDbException {
+
+        var builder = BatchWriteItemRequest.builder();
+
+        batchWriteItemRequest.accept(builder);
+
+        return batchWriteItem(builder.build());
     }
 
     @Override
