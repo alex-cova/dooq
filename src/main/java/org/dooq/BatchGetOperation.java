@@ -5,6 +5,7 @@ import org.dooq.api.DynamoRecord;
 import org.dooq.api.Table;
 import org.dooq.core.DynamoOperation;
 import org.dooq.core.response.BufferedBatchGetItemResponse;
+import org.dooq.util.AwsLimits;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
@@ -138,18 +139,12 @@ public class BatchGetOperation<R extends DynamoRecord<R>, K extends Key> extends
             return new BufferedBatchGetItemResponse<>(execute(keyList), getTable(), new ArrayList<>(keyList));
         }
 
-        var keys = new ArrayList<>(keyList);
-
-        BatchGetItemResponse response;
         Map<String, List<Map<String, AttributeValue>>> values = new HashMap<>();
 
-        for (int i = 0; i < keyList.size(); i += 100) {
-            var subList = keys.subList(i, Math.min(i + 100, keyList.size()));
+        var responses = AwsLimits.paginate(keyList, AwsLimits.MAX_BATCH_GET_SIZE, this::execute);
 
-            response = execute(subList);
-
-            if (response == null || response.responses() == null) continue;
-
+        for (BatchGetItemResponse response : responses) {
+            if (response == null) continue;
             values.putAll(response.responses());
         }
 

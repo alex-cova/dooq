@@ -5,6 +5,7 @@ import org.dooq.api.Table;
 import org.dooq.core.DynamoOperation;
 import org.dooq.core.ItemParser;
 import org.dooq.core.response.BufferedBatchWriteItemRequest;
+import org.dooq.util.AwsLimits;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.BatchWriteItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.PutRequest;
@@ -75,23 +76,25 @@ public class BatchPutOperation<R extends DynamoRecord<R>, K extends Key> extends
 
     public BufferedBatchWriteItemRequest execute() {
 
-        var writeMap = new HashMap<String, List<WriteRequest>>();
+        var responses = AwsLimits.paginate(items, AwsLimits.MAX_BATCH_PUT_SIZE, batch -> {
+            var writeMap = new HashMap<String, List<WriteRequest>>();
 
-        writeMap.put(getTable().getTableName(), items
-                .stream()
-                .map(this::write)
-                .collect(Collectors.toList()));
+            writeMap.put(getTable().getTableName(), batch
+                    .stream()
+                    .map(this::write)
+                    .collect(Collectors.toList()));
 
-        var request = builder.requestItems(writeMap)
-                .build();
+            var request = builder.requestItems(writeMap)
+                    .build();
 
-        if (debug) Logger.getLogger(BatchPutOperation.class.getName())
-                .log(Level.INFO, request.toString());
+            if (debug) Logger.getLogger(BatchPutOperation.class.getName())
+                    .log(Level.INFO, request.toString());
 
-        var response = getClient()
-                .batchWriteItem(request);
+            return getClient()
+                    .batchWriteItem(request);
+        });
 
-        return new BufferedBatchWriteItemRequest(response);
+        return new BufferedBatchWriteItemRequest(responses);
 
     }
 }

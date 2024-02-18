@@ -4,6 +4,7 @@ import org.dooq.api.DynamoRecord;
 import org.dooq.api.Table;
 import org.dooq.core.DynamoOperation;
 import org.dooq.core.response.BufferedBatchWriteItemRequest;
+import org.dooq.util.AwsLimits;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.BatchWriteItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.DeleteRequest;
@@ -71,19 +72,23 @@ public class BatchDeleteOperation<R extends DynamoRecord<R>, K extends Key> exte
 
         if (keys.isEmpty()) throw new IllegalStateException("No items specified to delete");
 
-        var requests = keys.stream()
-                .map(this::deleteRequest)
-                .collect(Collectors.toList());
+        var results = AwsLimits.paginate(keys, AwsLimits.MAX_BATCH_DELETE_SIZE, batch -> {
 
-        var writeMap = Map.of(getTable().getTableName(), requests);
+            var requests = batch.stream()
+                    .map(this::deleteRequest)
+                    .collect(Collectors.toList());
 
-        var request = builder.requestItems(writeMap)
-                .build();
+            var writeMap = Map.of(getTable().getTableName(), requests);
 
-        if (debug) Logger.getLogger(BatchDeleteOperation.class.getName())
-                .log(Level.INFO, request.toString());
+            var request = builder.requestItems(writeMap)
+                    .build();
 
-        return new BufferedBatchWriteItemRequest(client.batchWriteItem(request));
+            if (debug) Logger.getLogger(BatchDeleteOperation.class.getName())
+                    .log(Level.INFO, request.toString());
 
+            return client.batchWriteItem(request);
+        });
+
+        return new BufferedBatchWriteItemRequest(results);
     }
 }

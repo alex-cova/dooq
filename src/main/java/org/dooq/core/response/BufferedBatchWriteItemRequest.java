@@ -2,20 +2,26 @@ package org.dooq.core.response;
 
 import software.amazon.awssdk.services.dynamodb.model.BatchWriteItemResponse;
 
+import java.util.List;
+
 public class BufferedBatchWriteItemRequest {
 
-    private final BatchWriteItemResponse response;
+    private final List<BatchWriteItemResponse> responses;
 
     public BufferedBatchWriteItemRequest(BatchWriteItemResponse response) {
-        this.response = response;
+        this.responses = List.of(response);
+    }
+
+    public BufferedBatchWriteItemRequest(List<BatchWriteItemResponse> responses) {
+        this.responses = responses;
     }
 
     public BatchWriteItemResponse response() {
-        return response;
+        return responses.get(0);
     }
 
     public boolean isSuccess() {
-        return response.unprocessedItems().isEmpty();
+        return responses.stream().allMatch(a -> a.unprocessedItems().isEmpty());
     }
 
 }
